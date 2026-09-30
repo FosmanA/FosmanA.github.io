@@ -84,6 +84,9 @@
       text-decoration-thickness: 2px;
       text-underline-offset: 4px;
     }
+    .links { margin: 12px 0 0; display: flex; flex-wrap: wrap; gap: 8px 24px; font-size: 1rem; }
+    .links a { color: var(--dim); text-decoration: underline; text-underline-offset: 4px; }
+    .links a:hover { color: var(--gold); }
 
     .frame {
       aspect-ratio: 1;
@@ -114,6 +117,10 @@
       <p class="runes" aria-hidden="true" data-i18n-title="runeTitle" title="“Türük” in Old Turkic (Orkhon) script"><span lang="otk">𐱅𐰇𐰼𐰜</span></p>
       <p class="lede" data-i18n="lede">A small independent game studio in Türkiye. We make pixel games and take our patterns from the kilim.</p>
       <p class="contact"><span data-i18n="write">Write to us:</span> <a href="mailto:main@foastudios.com">main@foastudios.com</a></p>
+      <p class="links">
+        <a href="https://play.google.com/store/apps/details?id=com.osmanalkan.kirikay" data-i18n="play">Kırıkay on Google Play</a>
+        <a href="https://claude.ai/code/artifact/a6f58403-555c-4607-a16a-434b8a19ad1a" data-i18n="privacy">Kırıkay privacy policy</a>
+      </p>
     </section>
     <div class="frame">
       <canvas id="field" role="img" data-i18n-aria="field" aria-label="A ball breaking a wall of kilim-patterned bricks"></canvas>
@@ -129,6 +136,8 @@
       en: {
         lede: "A small independent game studio in Türkiye. We make pixel games and take our patterns from the kilim.",
         write: "Write to us:",
+        play: "Kırıkay on Google Play",
+        privacy: "Kırıkay privacy policy",
         runeTitle: "“Türük” in Old Turkic (Orkhon) script",
         field: "A ball breaking a wall of kilim-patterned bricks",
         desc: "FOA Studios is a small independent game studio in Türkiye making pixel games.",
@@ -137,6 +146,8 @@
       tr: {
         lede: "Türkiye'de küçük, bağımsız bir oyun stüdyosu. Piksel oyunlar yapıyoruz, desenlerimizi kilimden alıyoruz.",
         write: "Bize yazın:",
+        play: "Kırıkay Google Play'de",
+        privacy: "Kırıkay gizlilik politikası",
         runeTitle: "Orhun yazısıyla “Türük”",
         field: "Kilim desenli tuğlalardan bir duvarı kıran top",
         desc: "FOA Studios, Türkiye'de piksel oyunlar yapan küçük, bağımsız bir oyun stüdyosu.",
