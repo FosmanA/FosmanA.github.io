@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="How to delete your Drift community account and what happens to your data.">
+<!-- Hesap silme sayfası (Play Console 'hesap silme' bağlantısı). Uygulamadaki yol: Upload > Account > Delete account.
+     Yayındaki kopya: https://foastudios.com/drift-hesap-silme/
+     İletişim adresi main@foastudios.com. Hukuki danışmanlık değildir; düz dille yazıldı. -->
+<title>Delete your Drift account</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<style>
+  :root{
+    --bg:#f5f4fb; --surface:#ffffff; --surface-2:#fbfaff;
+    --text:#1b1d29; --muted:#5b5e74; --faint:#6f7290;
+    --border:#e7e4f3; --accent:#5a4bd0; --accent-strong:#4636b8;
+    --good:#2f9e86; --glow:rgba(120,105,230,.10);
+    --shadow:0 1px 2px rgba(30,26,60,.05), 0 12px 30px rgba(40,32,90,.07);
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#0f1119; --surface:#181b27; --surface-2:#13151f;
+      --text:#e9eaf2; --muted:#9a9db4; --faint:#8a8da6;
+      --border:#292c3b; --accent:#b3a8f2; --accent-strong:#c9c0ff;
+      --good:#6fd6c0; --glow:rgba(120,105,230,.16);
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 16px 40px rgba(0,0,0,.4);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0f1119; --surface:#181b27; --surface-2:#13151f;
+    --text:#e9eaf2; --muted:#9a9db4; --faint:#8a8da6;
+    --border:#292c3b; --accent:#b3a8f2; --accent-strong:#c9c0ff;
+    --good:#6fd6c0; --glow:rgba(120,105,230,.16);
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 16px 40px rgba(0,0,0,.4);
+  }
+
+  *,*::before,*::after{box-sizing:border-box}
+  html{color-scheme:light dark;-webkit-text-size-adjust:100%}
+  body{
+    margin:0; color:var(--text); background:var(--bg);
+    background-image:radial-gradient(120% 80% at 50% -10%, var(--glow), transparent 60%);
+    background-attachment:fixed;
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:17px; line-height:1.65; letter-spacing:-0.003em;
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-family:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace}
+
+  .page{max-width:660px; margin:0 auto; padding:56px 16px 72px;}
+  @media (min-width:560px){ .page{padding:72px 32px 88px} }
+
+  .brand{display:flex; align-items:center; gap:12px; margin-bottom:44px}
+  .mark{width:34px; height:34px; border-radius:9px; flex:none; position:relative;
+    background:linear-gradient(135deg,#3a3460,#17142b); box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+  .mark span{position:absolute; left:22%; right:22%; height:2.6px; border-radius:3px;
+    background:linear-gradient(90deg,#b7afe6,#8b7ff0)}
+  .mark span:nth-child(1){top:33%} .mark span:nth-child(2){top:50%} .mark span:nth-child(3){top:67%}
+  .wordmark{font-weight:650; font-size:16.5px; letter-spacing:-0.01em}
+  .wordmark em{font-style:normal; color:var(--muted); font-weight:500}
+
+  .eyebrow{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    text-transform:uppercase; letter-spacing:.16em; font-size:12px; color:var(--accent);
+    margin:0 0 14px}
+  h1{font-size:clamp(2.1rem,6vw,2.9rem); line-height:1.06; letter-spacing:-0.03em;
+    font-weight:750; margin:0 0 18px; text-wrap:balance}
+  .lead{font-size:1.16rem; color:var(--muted); margin:0 0 26px; max-width:56ch}
+  .lead b{color:var(--text); font-weight:600}
+
+  .chips{display:flex; flex-wrap:wrap; gap:9px; padding:0; margin:0 0 8px; list-style:none}
+  .chips li{display:inline-flex; align-items:center; gap:7px;
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace; font-size:12.5px;
+    color:var(--text); background:var(--surface); border:1px solid var(--border);
+    padding:7px 12px; border-radius:999px; box-shadow:var(--shadow)}
+  .chips li::before{content:""; width:6px; height:6px; border-radius:50%; background:var(--good)}
+
+  .rule{height:1px; background:var(--border); border:0; margin:44px 0}
+
+  section{margin:0}
+  h2{font-size:0.82rem; text-transform:uppercase; letter-spacing:.11em; font-weight:650;
+    color:var(--faint); margin:0 0 18px}
+  .section-note{color:var(--muted); margin:-8px 0 20px; font-size:1.02rem}
+
+  .cards{display:grid; gap:14px}
+  .card{display:grid; grid-template-columns:auto 1fr; gap:16px; align-items:start;
+    background:var(--surface); border:1px solid var(--border); border-radius:16px;
+    padding:20px 22px; box-shadow:var(--shadow)}
+  @media (max-width:420px){ .card{grid-template-columns:1fr; gap:12px; padding:18px} }
+  .card-ic{width:38px; height:38px; border-radius:10px; display:grid; place-items:center;
+    background:var(--surface-2); border:1px solid var(--border); color:var(--accent)}
+  .card-ic svg{width:20px; height:20px; display:block}
+  .card h3{margin:2px 0 6px; font-size:1.04rem; font-weight:640; letter-spacing:-0.01em}
+  .card p{margin:0; color:var(--muted); font-size:0.99rem; line-height:1.6}
+  .card p + p{margin-top:8px}
+
+  .checklist{list-style:none; padding:0; margin:0; display:grid; gap:13px}
+  .checklist li{display:grid; grid-template-columns:22px 1fr; gap:12px; align-items:start;
+    color:var(--text); font-size:1.02rem}
+  .checklist li b{font-weight:600}
+  .check{width:22px; height:22px; margin-top:1px; color:var(--good); flex:none}
+  .check svg{width:22px; height:22px; display:block}
+
+  .minor{display:grid; gap:26px}
+  .minor h2{margin-bottom:8px}
+  .minor p{margin:0; color:var(--muted); font-size:1.02rem}
+  a{color:var(--accent-strong); text-underline-offset:2px}
+  a:hover{color:var(--accent)}
+  a:focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:3px}
+
+  footer{margin-top:52px; padding-top:22px; border-top:1px solid var(--border);
+    color:var(--faint); font-size:0.86rem; display:flex; flex-wrap:wrap; gap:6px 16px}
+  footer .mono{color:var(--muted)}
+
+  .page{animation:rise .5s cubic-bezier(.2,.7,.2,1) both}
+  @keyframes rise{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:none}}
+  @media (prefers-reduced-motion:reduce){ .page{animation:none} }
+
+  h2.big{font-size:1.28rem; text-transform:none; letter-spacing:-0.01em; color:var(--text); margin:0 0 12px; font-weight:680}
+  h3.sub{font-size:1.02rem; margin:22px 0 6px; font-weight:640}
+  .prose p{margin:0 0 12px; color:var(--muted); font-size:1.02rem}
+  .prose p b, .prose li b{color:var(--text); font-weight:600}
+  .prose ul{margin:0 0 14px; padding-left:1.2em; color:var(--muted); font-size:1.02rem}
+  .prose li{margin:0 0 7px}
+  .rules h2{font-size:1.05rem; text-transform:none; letter-spacing:-0.005em; color:var(--text); margin:30px 0 8px; font-weight:660}
+  .rules ul{margin:0; padding-left:1.2em; color:var(--muted)}
+  .rules li{margin:0 0 7px}
+  .table-wrap{overflow-x:auto; margin:0 0 16px; border:1px solid var(--border); border-radius:14px; background:var(--surface); box-shadow:var(--shadow)}
+  table{border-collapse:collapse; width:100%; font-size:0.94rem}
+  th,td{text-align:left; vertical-align:top; padding:11px 14px; border-bottom:1px solid var(--border)}
+  tr:last-child td{border-bottom:0}
+  th{font-size:0.78rem; text-transform:uppercase; letter-spacing:.08em; color:var(--faint); font-weight:650; background:var(--surface-2)}
+  td{color:var(--muted)} td:first-child{color:var(--text)}
+  .nav{display:flex; flex-wrap:wrap; gap:6px 18px; margin:-26px 0 38px; font-size:0.94rem}
+  .nav a[aria-current="page"]{color:var(--text); font-weight:600; text-decoration:none}
+  .langbox{margin-top:8px}
+  .note{background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--accent); border-radius:12px; padding:14px 16px; margin:0 0 18px; color:var(--muted); font-size:0.98rem}
+  .note b{color:var(--text)}
+  form{display:grid; gap:18px; margin:6px 0 10px}
+  .field{display:grid; gap:6px}
+  label{font-weight:600; font-size:0.97rem}
+  label small{font-weight:400; color:var(--muted); font-size:0.9rem}
+  input[type=text],input[type=email],input[type=url],textarea{
+    font:inherit; font-weight:400; color:var(--text); background:var(--surface); width:100%;
+    border:1px solid var(--border); border-radius:11px; padding:11px 13px; -webkit-appearance:none; appearance:none}
+  textarea{min-height:132px; resize:vertical}
+  input:focus-visible,textarea:focus-visible,button:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+  input[aria-invalid="true"],textarea[aria-invalid="true"]{border-color:#c0392b}
+  .hint{font-weight:400; font-size:0.9rem; color:var(--muted); min-height:0}
+  .hint.err{color:#c0392b}
+  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .hint.err, :root:not([data-theme="light"]) input[aria-invalid="true"]{color:#ff8f80} }
+  .check-row{display:grid; grid-template-columns:22px 1fr; gap:11px; align-items:start}
+  .check-row label{font-weight:400}
+  .idnote{margin:0; border-left-color:var(--good)}
+  .idnote a{font-weight:600}
+  .check-row input{width:20px; height:20px; margin:2px 0 0; accent-color:var(--accent-strong)}
+  button.go{font:inherit; font-weight:640; color:#fff; background:var(--accent-strong); border:0; border-radius:12px; padding:13px 20px; cursor:pointer; justify-self:start}
+  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) button.go{color:#14121f; background:var(--accent)} }
+  button.go[disabled]{opacity:.55; cursor:default}
+  #notice-form{display:none} .js #notice-form{display:grid}
+  .result{margin:0; padding:14px 16px; border-radius:12px; border:1px solid var(--border); background:var(--surface); display:none}
+  .result.show{display:block}
+  .result.good{border-color:var(--good)}
+  .result.bad{border-color:#c0392b}
+</style>
+</head>
+<body>
+<main class="page">
+  <header class="brand">
+    <span class="mark" aria-hidden="true"><span></span><span></span><span></span></span>
+    <span class="wordmark">Drift <em>Live Wallpapers</em></span>
+  </header>
+
+  <p class="eyebrow">Delete account</p>
+  <h1>Delete your Drift account.</h1>
+  <p class="lead">You can delete your account and its data yourself, in the app, in a few taps. If you cannot, e-mail us and we will do it.</p>
+  <nav class="nav" aria-label="Drift pages"><a href="../drift-gizlilik/">Privacy policy</a><a href="../drift-kurallar/">Community rules</a><a href="../drift-telif/">Copyright notice</a><a href="../drift-hesap-silme/" aria-current="page">Delete account</a></nav>
+
+  <hr class="rule">
+  <section class="prose">
+    <h2>In the app</h2>
+    <ol>
+      <li>Open Drift and go to <b>Upload</b>.</li>
+      <li>Open <b>Account</b>.</li>
+      <li>Tap <b>Delete account</b> and confirm.</li>
+    </ol>
+    <p>If something fails halfway, tap <b>Delete account</b> again; running it twice is safe. You are signed out only when the deletion has finished.</p>
+  </section>
+
+  <hr class="rule">
+  <section class="prose">
+    <h2>What is deleted</h2>
+    <ul>
+      <li>Your profile: username, birth year, sign-in record.</li>
+      <li>Your <b>likes</b> and your <b>blocks</b> (both directions) and your appeals.</li>
+      <li>Your <b>uploads</b>: they are taken down at once, and other phones remove their copies the next time they connect. The files then follow the usual schedule (up to 90 days in a private archive, then deleted).</li>
+      <li>The reports you sent stay, but no longer point to you.</li>
+    </ul>
+    <h2>What is kept</h2>
+    <ul>
+      <li>If your account had strikes or was banned: a <b>one-way fingerprint</b> of your Google account and the strike count, for <b>1 year</b>, so a closed account cannot simply return. It cannot be turned back into your e-mail or name.</li>
+      <li>Moderation log entries and copyright notices about your uploads, for <b>1 year</b>.</li>
+      <li>Reports other people made about your profile: resolved ones are deleted 1 year after they are handled; open ones are kept until a moderator handles them.</li>
+      <li>For each of your removed or rejected uploads, once its files are deleted: its title, tags and a content fingerprint, so the same file can't be uploaded again. They are no longer linked to you.</li>
+    </ul>
+    <p>Details are in the <a href="../drift-gizlilik/">privacy policy</a>.</p>
+  </section>
+
+  <hr class="rule">
+  <section class="prose">
+    <h2>Cannot use the app?</h2>
+    <p>E-mail <a href="mailto:main@foastudios.com">main@foastudios.com</a> from the address linked to your Google sign-in, with the subject "Delete my Drift account" and your @username. We will reply to confirm it is you, delete the account, and tell you when it is done.</p>
+    <p>You do not need an account to use Drift without uploading. Without an account, Drift keeps no profile of you.</p>
+  </section>
+
+  <hr class="rule">
+  <section class="prose" lang="tr">
+    <h2 class="big">Hesap silme (Türkçe özet)</h2>
+    <p><b>Uygulamada:</b> Drift &rarr; <b>Upload</b> &rarr; <b>Account</b> &rarr; <b>Delete account</b> ve onaylayın. Yarıda kalırsa yeniden basabilirsiniz.</p>
+    <p><b>Silinenler:</b> profiliniz, beğenileriniz, engellemeleriniz, itirazlarınız; yüklemeleriniz hemen kaldırılır ve diğer telefonlardaki kopyalar silinir. Gönderdiğiniz şikâyetler kalır ama size bağlı olmaz.</p>
+    <p><b>Tutulanlar:</b> uyarısı ya da yasağı olan hesaplarda Google hesabının tek yönlü parmak izi ve uyarı sayısı 1 yıl; yüklemelerinizle ilgili moderasyon kayıtları ve telif bildirimleri 1 yıl; profiliniz hakkındaki şikâyetler sonuçlandıktan 1 yıl sonra silinir (açık olanlar işlenene dek kalır); kaldırılan ya da reddedilen yüklemelerinizin dosyaları silindikten sonra aynı dosya yeniden yüklenemesin diye başlık, etiketler ve içerik parmak izi kalır, size bağlı olmaz.</p>
+    <p><b>Uygulamayı kullanamıyorsanız:</b> <a href="mailto:main@foastudios.com">main@foastudios.com</a> adresine, Google girişinizle bağlı adresten "Delete my Drift account" konusuyla ve kullanıcı adınızla yazın.</p>
+  </section>
+
+  <footer>
+    <span class="mono">Last updated 24 October 2026</span>
+    <span>© 2026 <a href="https://foastudios.com/">FOA Studios</a> · Drift Live Wallpapers</span>
+  </footer>
+</main>
+</body>
+</html>

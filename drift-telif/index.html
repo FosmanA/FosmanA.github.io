@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Send a copyright notice about a wallpaper in Drift's community library.">
+<!-- Telif bildirimi formu: Supabase submit_takedown RPC'sine anon (publishable) anahtarla gönderir; JS yoksa e-posta yolu gösterilir.
+     Buraya servis anahtarı ASLA konmaz (site.test.js denetler).
+     Yayındaki kopya: https://foastudios.com/drift-telif/
+     İletişim adresi main@foastudios.com. Hukuki danışmanlık değildir; düz dille yazıldı. -->
+<title>Drift Copyright Notice</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<style>
+  :root{
+    --bg:#f5f4fb; --surface:#ffffff; --surface-2:#fbfaff;
+    --text:#1b1d29; --muted:#5b5e74; --faint:#6f7290;
+    --border:#e7e4f3; --accent:#5a4bd0; --accent-strong:#4636b8;
+    --good:#2f9e86; --glow:rgba(120,105,230,.10);
+    --shadow:0 1px 2px rgba(30,26,60,.05), 0 12px 30px rgba(40,32,90,.07);
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#0f1119; --surface:#181b27; --surface-2:#13151f;
+      --text:#e9eaf2; --muted:#9a9db4; --faint:#8a8da6;
+      --border:#292c3b; --accent:#b3a8f2; --accent-strong:#c9c0ff;
+      --good:#6fd6c0; --glow:rgba(120,105,230,.16);
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 16px 40px rgba(0,0,0,.4);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0f1119; --surface:#181b27; --surface-2:#13151f;
+    --text:#e9eaf2; --muted:#9a9db4; --faint:#8a8da6;
+    --border:#292c3b; --accent:#b3a8f2; --accent-strong:#c9c0ff;
+    --good:#6fd6c0; --glow:rgba(120,105,230,.16);
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 16px 40px rgba(0,0,0,.4);
+  }
+
+  *,*::before,*::after{box-sizing:border-box}
+  html{color-scheme:light dark;-webkit-text-size-adjust:100%}
+  body{
+    margin:0; color:var(--text); background:var(--bg);
+    background-image:radial-gradient(120% 80% at 50% -10%, var(--glow), transparent 60%);
+    background-attachment:fixed;
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:17px; line-height:1.65; letter-spacing:-0.003em;
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-family:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace}
+
+  .page{max-width:660px; margin:0 auto; padding:56px 16px 72px;}
+  @media (min-width:560px){ .page{padding:72px 32px 88px} }
+
+  .brand{display:flex; align-items:center; gap:12px; margin-bottom:44px}
+  .mark{width:34px; height:34px; border-radius:9px; flex:none; position:relative;
+    background:linear-gradient(135deg,#3a3460,#17142b); box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+  .mark span{position:absolute; left:22%; right:22%; height:2.6px; border-radius:3px;
+    background:linear-gradient(90deg,#b7afe6,#8b7ff0)}
+  .mark span:nth-child(1){top:33%} .mark span:nth-child(2){top:50%} .mark span:nth-child(3){top:67%}
+  .wordmark{font-weight:650; font-size:16.5px; letter-spacing:-0.01em}
+  .wordmark em{font-style:normal; color:var(--muted); font-weight:500}
+
+  .eyebrow{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    text-transform:uppercase; letter-spacing:.16em; font-size:12px; color:var(--accent);
+    margin:0 0 14px}
+  h1{font-size:clamp(2.1rem,6vw,2.9rem); line-height:1.06; letter-spacing:-0.03em;
+    font-weight:750; margin:0 0 18px; text-wrap:balance}
+  .lead{font-size:1.16rem; color:var(--muted); margin:0 0 26px; max-width:56ch}
+  .lead b{color:var(--text); font-weight:600}
+
+  .chips{display:flex; flex-wrap:wrap; gap:9px; padding:0; margin:0 0 8px; list-style:none}
+  .chips li{display:inline-flex; align-items:center; gap:7px;
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace; font-size:12.5px;
+    color:var(--text); background:var(--surface); border:1px solid var(--border);
+    padding:7px 12px; border-radius:999px; box-shadow:var(--shadow)}
+  .chips li::before{content:""; width:6px; height:6px; border-radius:50%; background:var(--good)}
+
+  .rule{height:1px; background:var(--border); border:0; margin:44px 0}
+
+  section{margin:0}
+  h2{font-size:0.82rem; text-transform:uppercase; letter-spacing:.11em; font-weight:650;
+    color:var(--faint); margin:0 0 18px}
+  .section-note{color:var(--muted); margin:-8px 0 20px; font-size:1.02rem}
+
+  .cards{display:grid; gap:14px}
+  .card{display:grid; grid-template-columns:auto 1fr; gap:16px; align-items:start;
+    background:var(--surface); border:1px solid var(--border); border-radius:16px;
+    padding:20px 22px; box-shadow:var(--shadow)}
+  @media (max-width:420px){ .card{grid-template-columns:1fr; gap:12px; padding:18px} }
+  .card-ic{width:38px; height:38px; border-radius:10px; display:grid; place-items:center;
+    background:var(--surface-2); border:1px solid var(--border); color:var(--accent)}
+  .card-ic svg{width:20px; height:20px; display:block}
+  .card h3{margin:2px 0 6px; font-size:1.04rem; font-weight:640; letter-spacing:-0.01em}
+  .card p{margin:0; color:var(--muted); font-size:0.99rem; line-height:1.6}
+  .card p + p{margin-top:8px}
+
+  .checklist{list-style:none; padding:0; margin:0; display:grid; gap:13px}
+  .checklist li{display:grid; grid-template-columns:22px 1fr; gap:12px; align-items:start;
+    color:var(--text); font-size:1.02rem}
+  .checklist li b{font-weight:600}
+  .check{width:22px; height:22px; margin-top:1px; color:var(--good); flex:none}
+  .check svg{width:22px; height:22px; display:block}
+
+  .minor{display:grid; gap:26px}
+  .minor h2{margin-bottom:8px}
+  .minor p{margin:0; color:var(--muted); font-size:1.02rem}
+  a{color:var(--accent-strong); text-underline-offset:2px}
+  a:hover{color:var(--accent)}
+  a:focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:3px}
+
+  footer{margin-top:52px; padding-top:22px; border-top:1px solid var(--border);
+    color:var(--faint); font-size:0.86rem; display:flex; flex-wrap:wrap; gap:6px 16px}
+  footer .mono{color:var(--muted)}
+
+  .page{animation:rise .5s cubic-bezier(.2,.7,.2,1) both}
+  @keyframes rise{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:none}}
+  @media (prefers-reduced-motion:reduce){ .page{animation:none} }
+
+  h2.big{font-size:1.28rem; text-transform:none; letter-spacing:-0.01em; color:var(--text); margin:0 0 12px; font-weight:680}
+  h3.sub{font-size:1.02rem; margin:22px 0 6px; font-weight:640}
+  .prose p{margin:0 0 12px; color:var(--muted); font-size:1.02rem}
+  .prose p b, .prose li b{color:var(--text); font-weight:600}
+  .prose ul{margin:0 0 14px; padding-left:1.2em; color:var(--muted); font-size:1.02rem}
+  .prose li{margin:0 0 7px}
+  .rules h2{font-size:1.05rem; text-transform:none; letter-spacing:-0.005em; color:var(--text); margin:30px 0 8px; font-weight:660}
+  .rules ul{margin:0; padding-left:1.2em; color:var(--muted)}
+  .rules li{margin:0 0 7px}
+  .table-wrap{overflow-x:auto; margin:0 0 16px; border:1px solid var(--border); border-radius:14px; background:var(--surface); box-shadow:var(--shadow)}
+  table{border-collapse:collapse; width:100%; font-size:0.94rem}
+  th,td{text-align:left; vertical-align:top; padding:11px 14px; border-bottom:1px solid var(--border)}
+  tr:last-child td{border-bottom:0}
+  th{font-size:0.78rem; text-transform:uppercase; letter-spacing:.08em; color:var(--faint); font-weight:650; background:var(--surface-2)}
+  td{color:var(--muted)} td:first-child{color:var(--text)}
+  .nav{display:flex; flex-wrap:wrap; gap:6px 18px; margin:-26px 0 38px; font-size:0.94rem}
+  .nav a[aria-current="page"]{color:var(--text); font-weight:600; text-decoration:none}
+  .langbox{margin-top:8px}
+  .note{background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--accent); border-radius:12px; padding:14px 16px; margin:0 0 18px; color:var(--muted); font-size:0.98rem}
+  .note b{color:var(--text)}
+  form{display:grid; gap:18px; margin:6px 0 10px}
+  .field{display:grid; gap:6px}
+  label{font-weight:600; font-size:0.97rem}
+  label small{font-weight:400; color:var(--muted); font-size:0.9rem}
+  input[type=text],input[type=email],input[type=url],textarea{
+    font:inherit; font-weight:400; color:var(--text); background:var(--surface); width:100%;
+    border:1px solid var(--border); border-radius:11px; padding:11px 13px; -webkit-appearance:none; appearance:none}
+  textarea{min-height:132px; resize:vertical}
+  input:focus-visible,textarea:focus-visible,button:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+  input[aria-invalid="true"],textarea[aria-invalid="true"]{border-color:#c0392b}
+  .hint{font-weight:400; font-size:0.9rem; color:var(--muted); min-height:0}
+  .hint.err{color:#c0392b}
+  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .hint.err, :root:not([data-theme="light"]) input[aria-invalid="true"]{color:#ff8f80} }
+  .check-row{display:grid; grid-template-columns:22px 1fr; gap:11px; align-items:start}
+  .check-row label{font-weight:400}
+  .idnote{margin:0; border-left-color:var(--good)}
+  .idnote a{font-weight:600}
+  .check-row input{width:20px; height:20px; margin:2px 0 0; accent-color:var(--accent-strong)}
+  button.go{font:inherit; font-weight:640; color:#fff; background:var(--accent-strong); border:0; border-radius:12px; padding:13px 20px; cursor:pointer; justify-self:start}
+  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) button.go{color:#14121f; background:var(--accent)} }
+  button.go[disabled]{opacity:.55; cursor:default}
+  #notice-form{display:none} .js #notice-form{display:grid}
+  .result{margin:0; padding:14px 16px; border-radius:12px; border:1px solid var(--border); background:var(--surface); display:none}
+  .result.show{display:block}
+  .result.good{border-color:var(--good)}
+  .result.bad{border-color:#c0392b}
+</style>
+</head>
+<body>
+<main class="page">
+  <header class="brand">
+    <span class="mark" aria-hidden="true"><span></span><span></span><span></span></span>
+    <span class="wordmark">Drift <em>Live Wallpapers</em></span>
+  </header>
+
+  <p class="eyebrow">Copyright notice</p>
+  <h1>Your work is on Drift? Tell us.</h1>
+  <p class="lead">If something in Drift's community library copies work you hold the rights to, send us a notice. A valid notice is acted on: the wallpaper is taken down, and the person who uploaded it can answer within 14 days.</p>
+  <nav class="nav" aria-label="Drift pages"><a href="../drift-gizlilik/">Privacy policy</a><a href="../drift-kurallar/">Community rules</a><a href="../drift-telif/" aria-current="page">Copyright notice</a><a href="../drift-hesap-silme/">Delete account</a></nav>
+
+  <hr class="rule">
+  <section class="prose">
+    <noscript><div class="note"><b>This form needs JavaScript.</b> Without it, e-mail <a href="mailto:main@foastudios.com">main@foastudios.com</a> with the same details: the wallpaper's id, your name, your e-mail address, what work it copies and why you hold the rights, and a link to the original.</div></noscript>
+    <div class="note">Fan edits are allowed in Drift, so a notice about one is expected and fine. Only send a notice if you hold the rights, or act for the person who does. We pass the reasoning to a moderator; the uploader is only told that a copyright notice was received, not who sent it. Not legal advice.</div>
+    <form id="notice-form" novalidate>
+    <div class="field"><label for="f-wallpaper">Wallpaper link or id <small>required</small></label><input aria-describedby="hint-wallpaper" type="text" id="f-wallpaper" name="wallpaper" autocomplete="off" spellcheck="false" placeholder="123e4567-e89b-42d3-a456-426614174000"><span class="hint" id="hint-wallpaper" aria-live="polite"></span></div>
+      <div class="note idnote"><b>Can't find the ID?</b> E-mail <a href="mailto:main@foastudios.com">main@foastudios.com</a> with the wallpaper's title, the uploader's @name and a screenshot, and we will find it. The app does not show the ID yet.</div>
+    <div class="field"><label for="f-claimant">Your name, or the rights holder <small>required</small></label><input aria-describedby="hint-claimant" type="text" id="f-claimant" name="claimant" autocomplete="name" maxlength="200"><span class="hint" id="hint-claimant" aria-live="polite"></span></div>
+    <div class="field"><label for="f-contact">E-mail address <small>required</small></label><input aria-describedby="hint-contact" type="email" id="f-contact" name="contact" autocomplete="email" maxlength="254" inputmode="email"><span class="hint" id="hint-contact" aria-live="polite"></span></div>
+    <div class="field"><label for="f-basis">What was copied, and why do you hold the rights? <small>required, up to 2000 characters</small></label><textarea aria-describedby="hint-basis" id="f-basis" name="basis" maxlength="2000"></textarea><span class="hint" id="hint-basis" aria-live="polite"></span></div>
+    <div class="field"><label for="f-original">Link to the original work <small>optional</small></label><input aria-describedby="hint-original" type="url" id="f-original" name="original" autocomplete="off" maxlength="500" placeholder="https://"><span class="hint" id="hint-original" aria-live="polite"></span></div>
+      <div class="field"><div class="check-row"><input type="checkbox" id="f-declare" name="declare" aria-describedby="hint-declare"><label for="f-declare">I state in good faith that the use described above is not allowed by the rights holder, and that the information in this notice is accurate. I hold the rights, or I am allowed to act for the person who does.</label></div><span class="hint" id="hint-declare" aria-live="polite"></span></div>
+      <button class="go" type="submit" id="notice-send">Send notice</button>
+    </form>
+    <p class="result" id="notice-result" tabindex="-1" role="status"></p>
+    <p>You can also e-mail <a href="mailto:main@foastudios.com">main@foastudios.com</a>. We keep copyright notices for 1 year (see the <a href="../drift-gizlilik/">privacy policy</a>). Uploaders can read how the rules treat copyright in the <a href="../drift-kurallar/">community rules</a>.</p>
+  </section>
+
+  <hr class="rule">
+  <section class="prose" lang="tr">
+    <h2 class="big">Telif bildirimi (Türkçe özet)</h2>
+    <p><b>ID'yi bulamıyor musunuz?</b> Duvar kağıdının başlığını, yükleyenin @adını ve bir ekran görüntüsünü <a href="mailto:main@foastudios.com">main@foastudios.com</a> adresine gönderin; duvar kağıdını biz buluruz.</p>
+    <p>Drift topluluk kütüphanesinde hakkını elinde tuttuğunuz bir eserin kopyalandığını düşünüyorsanız yukarıdaki formu doldurun ya da <a href="mailto:main@foastudios.com">main@foastudios.com</a> adresine yazın. Duvar kağıdının kimliğini (id) ya da onu içeren bir bağlantıyı, adınızı, e-posta adresinizi, neyin kopyalandığını ve hakkı neden elinizde tuttuğunuzu belirtin. Geçerli bildirim işleme alınır: duvar kağıdı kaldırılır; yükleyen 14 gün içinde karşı bildirimde bulunabilir. Yükleyene yalnız "telif bildirimi alındı" bilgisi gider, sizin bilgileriniz gösterilmez. Bildirimler 1 yıl saklanır. Bu sayfa hukuki danışmanlık değildir.</p>
+  </section>
+
+  <footer>
+    <span class="mono">Last updated 24 October 2026</span>
+    <span>© 2026 <a href="https://foastudios.com/">FOA Studios</a> · Drift Live Wallpapers</span>
+  </footer>
+</main>
+<script>
+(function (root) {
+  "use strict";
+  var URL_BASE = "https://quidicqnouipeizpxmgp.supabase.co";
+  // Publishable key: it is meant to be public (it only reaches the functions the site is allowed to call). Never put a service key here.
+  var KEY = "sb_publishable_LUADEcDnhyMBHbJ99paEHg_7bgBlC9y";
+  var UUID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
+
+  function extractId(s) { var m = UUID.exec(String(s || "")); return m ? m[0].toLowerCase() : null; }
+
+  // f: {wallpaper, claimant, contact, basis, original} as typed. null when the wallpaper link/id has no id in it.
+  function buildRequest(f) {
+    var id = extractId(f.wallpaper);
+    if (!id) return null;
+    var original = String(f.original || "").trim();
+    return {
+      url: URL_BASE + "/rest/v1/rpc/submit_takedown",
+      init: {
+        method: "POST",
+        headers: { "Content-Type": "application/json", apikey: KEY, Authorization: "Bearer " + KEY },
+        body: JSON.stringify({
+          p_wallpaper: id,
+          p_claimant: String(f.claimant || "").trim(),
+          p_contact: String(f.contact || "").trim(),
+          p_basis: String(f.basis || "").trim(),
+          p_original_url: original ? original : null
+        })
+      }
+    };
+  }
+
+  // ok | rate_limited | invalid | not_found | error
+  function interpret(res) {
+    return res.json().then(function (body) {
+      if (res.ok) return body === "ok" ? "ok" : body === "rate_limited" ? "rate_limited" : "error";
+      var m = body && body.message;
+      return m === "invalid" || m === "not_found" ? m : "error";
+    }, function () { return "error"; });
+  }
+
+  function send(f, fetchFn) {
+    var req = buildRequest(f);
+    if (!req) return Promise.resolve("invalid");
+    return Promise.resolve().then(function () { return fetchFn(req.url, req.init); })
+      .then(interpret, function () { return "error"; });
+  }
+
+  root.DriftTakedown = { extractId: extractId, buildRequest: buildRequest, interpret: interpret, send: send };
+
+  if (!root.document) return;
+  var doc = root.document;
+  var form = doc.getElementById("notice-form");
+  if (!form) return;
+  doc.documentElement.classList.add("js");
+  var out = doc.getElementById("notice-result");
+  var btn = doc.getElementById("notice-send");
+  var MESSAGES = {
+    ok: ["good", "Thank you. Your notice was received. A moderator will look at it, and we will act on it if it is valid. We may write to the e-mail address you gave."],
+    rate_limited: ["bad", "Too many notices from your network today. Please try again tomorrow, or e-mail main@foastudios.com."],
+    error: ["bad", "Something went wrong and your notice was not sent. Please try again later or e-mail main@foastudios.com."]
+  };
+  function hint(name, text) {
+    var el = doc.getElementById("hint-" + name), input = doc.getElementById("f-" + name);
+    if (el) { el.textContent = text || ""; el.className = text ? "hint err" : "hint"; }
+    if (input) { if (text) input.setAttribute("aria-invalid", "true"); else input.removeAttribute("aria-invalid"); }
+  }
+  function show(kind, text) { out.className = "result show " + kind; out.textContent = text; out.focus(); }
+  function value(n) { return doc.getElementById("f-" + n).value; }
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    ["wallpaper", "claimant", "contact", "basis", "original", "declare"].forEach(function (n) { hint(n, ""); });
+    out.className = "result";
+    var f = { wallpaper: value("wallpaper"), claimant: value("claimant"), contact: value("contact"), basis: value("basis"), original: value("original") };
+    var bad = false;
+    if (!extractId(f.wallpaper)) { hint("wallpaper", "We could not find a wallpaper id in this. It looks like 123e4567-e89b-42d3-a456-426614174000."); bad = true; }
+    if (!f.claimant.trim() || f.claimant.trim().length > 200) { hint("claimant", "Enter your name or the rights holder's name (up to 200 characters)."); bad = true; }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.contact.trim()) || f.contact.trim().length > 254) { hint("contact", "Enter an e-mail address we can write to."); bad = true; }
+    if (!f.basis.trim() || f.basis.trim().length > 2000) { hint("basis", "Tell us what work this copies and why you hold the rights (up to 2000 characters)."); bad = true; }
+    if (f.original.trim().length > 500) { hint("original", "Up to 500 characters."); bad = true; }
+    if (!doc.getElementById("f-declare").checked) { hint("declare", "Please tick the statement."); bad = true; }
+    if (bad) { var first = form.querySelector('[aria-invalid="true"]'); if (first) first.focus(); return; }
+    btn.disabled = true; btn.textContent = "Sending…";
+    send(f, root.fetch.bind(root)).then(function (r) {
+      btn.disabled = false; btn.textContent = "Send notice";
+      if (r === "ok") { form.reset(); show.apply(null, MESSAGES.ok); }
+      else if (r === "invalid") { hint("wallpaper", "Check the wallpaper id and the other fields, then try again."); show("bad", "The notice was not accepted. Please check the fields marked above."); }
+      else if (r === "not_found") { hint("wallpaper", "We could not find a public wallpaper with this id. It may already be removed. If you think this is wrong, e-mail us."); show("bad", "No public wallpaper matches that id."); }
+      else show.apply(null, MESSAGES[r]);
+    });
+  });
+})(typeof window !== "undefined" ? window : globalThis);
+</script>
+</body>
+</html>
