@@ -1,0 +1,14 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.foalkan.drift",
+      "sha256_cert_fingerprints": [
+        "C1:83:0E:FE:2C:29:F8:43:EF:C6:8D:A6:3C:EC:F1:50:B0:46:4C:AA:F8:4B:F7:6B:37:76:FF:6D:AE:47:04:EA",
+        "55:E7:82:94:E3:7D:21:62:63:72:A1:9B:10:E5:99:1C:9A:AC:DF:74:61:B4:7F:50:E5:18:93:CA:E2:98:BC:33",
+        "9C:31:8C:5A:BA:F9:08:70:95:C9:21:3B:30:D3:E6:AD:49:09:7E:7B:AC:D3:88:F1:57:91:18:0E:E4:2F:80:AA"
+      ]
+    }
+  }
+]

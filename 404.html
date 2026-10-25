@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#050506">
+<title>Not found - FOA Studios</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<!-- GitHub Pages serves this file for every path that does not exist.
+     /d/<uuid>  : a shared Drift wallpaper link (the Android app opens it directly through App Links; this page is for
+                  phones without the app, other browsers, and desktops). It asks the public catalog for the wallpaper:
+                  found -> its name (and poster when the CDN base below is set); nothing back -> the generic "Get Drift"
+                  page. During the closed beta the catalog is not readable without signing in, so the generic page is the
+                  expected one. It is not a web version of the library.
+     anything else : a plain "page not found" for foastudios.com.
+     Single file, no dependencies. The key below is the app's public (anon/publishable) key, the same one the app ships with. -->
+<style>
+  :root{
+    --bg:#050506; --surface:#0e0e11; --surface-2:#17171b; --line:#222228;
+    --ink:#ecebe6; --ink-2:#a9a8a1; --sodium:#ffae57; --on-sodium:#1c0f02;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html{color-scheme:dark;-webkit-text-size-adjust:100%}
+  body{
+    margin:0; min-height:100vh; min-height:100dvh; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:32px 16px; background:var(--bg); color:var(--ink);
+    font:400 17px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  :focus-visible{outline:3px solid var(--sodium); outline-offset:3px}
+  main{width:100%; max-width:420px; text-align:center}
+  .poster{display:block; width:min(60vw,220px); aspect-ratio:9/20; margin:0 auto 24px; object-fit:cover;
+    border-radius:20px; border:1px solid var(--line); background:var(--surface-2)}
+  .eyebrow{margin:0 0 8px; font:500 12px/1 ui-monospace,"SF Mono",Menlo,Consolas,monospace; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-2)}
+  h1{margin:0; font-size:clamp(1.75rem,7vw,2.25rem); line-height:1.1; letter-spacing:-.02em; text-wrap:balance}
+  p.lede{margin:14px 0 0; color:var(--ink-2)}
+  .actions{display:grid; gap:12px; margin-top:32px}
+  .btn{display:flex; align-items:center; justify-content:center; min-height:52px; padding:12px 20px; border-radius:14px;
+    font-weight:600; text-decoration:none; border:1px solid var(--line); color:var(--ink); background:var(--surface-2)}
+  .btn--primary{background:var(--sodium); border-color:var(--sodium); color:var(--on-sodium)}
+  .btn:hover{filter:brightness(1.08)}
+  footer{margin-top:40px; font-size:14px; color:var(--ink-2)}
+  footer a{color:var(--ink-2)}
+  [hidden]{display:none !important}
+</style>
+</head>
+<body>
+<main>
+  <!-- /d/<uuid> -->
+  <section id="share" hidden>
+    <img id="poster" class="poster" alt="" hidden>
+    <p class="eyebrow">Drift live wallpaper</p>
+    <h1 id="share-title">A live wallpaper, shared with you</h1>
+    <p class="lede" id="share-lede">Drift plays video loops as your Android wallpaper, and runs a lot lighter than it sounds.</p>
+    <div class="actions">
+      <a class="btn btn--primary" id="play" href="https://play.google.com/store/apps/details?id=com.foalkan.drift">Get Drift on Google Play</a>
+      <a class="btn" id="open" href="https://foastudios.com/">Open in app</a>
+    </div>
+  </section>
+
+  <!-- any other missing path -->
+  <section id="lost" hidden>
+    <p class="eyebrow">404</p>
+    <h1>This page isn't here</h1>
+    <p class="lede">The link may be old, or mistyped.</p>
+    <div class="actions"><a class="btn btn--primary" href="/">FOA Studios home</a></div>
+  </section>
+</main>
+<footer><a href="/">FOA Studios</a> &middot; <a href="/drift-gizlilik/">Privacy</a></footer>
+
+<script>
+(function () {
+  var SUPABASE_URL = "https://quidicqnouipeizpxmgp.supabase.co";
+  var ANON_KEY = "sb_publishable_LUADEcDnhyMBHbJ99paEHg_7b";
+  var CDN_BASE = "";   // the public CDN (drift-public bucket) for the poster; empty = no poster, the name alone
+  var PLAY = "https://play.google.com/store/apps/details?id=com.foalkan.drift";
+  var UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+
+  function $(id) { return document.getElementById(id); }
+  var m = /^\/d\/([^\/?#]+)\/?$/.exec(location.pathname);
+  var id = m ? m[1].toLowerCase() : "";
+  if (!UUID.test(id)) { $("lost").hidden = false; return; }
+
+  $("share").hidden = false;
+  var link = "https://foastudios.com/d/" + id;
+  var android = /Android/i.test(navigator.userAgent);
+  // Chrome on Android: open the app on this link, else fall back to Google Play
+  $("open").href = android
+    ? "intent://foastudios.com/d/" + id + "#Intent;scheme=https;package=com.foalkan.drift;S.browser_fallback_url=" + encodeURIComponent(PLAY) + ";end"
+    : link;
+  document.title = "Drift live wallpaper";
+
+  // The wallpaper itself, when the catalog lets this page read it (an empty answer, an error or no network: the generic page).
+  var q = "select=title,variants&status=eq.approved&id=eq." + id + "&limit=1";
+  try {
+    fetch(SUPABASE_URL + "/rest/v1/wallpapers?" + q, { headers: { apikey: ANON_KEY, Accept: "application/json" } })
+      .then(function (r) { return r.ok ? r.json() : []; })
+      .then(function (rows) {
+        var row = Array.isArray(rows) && rows.length ? rows[0] : null;
+        if (!row || typeof row.title !== "string" || !row.title) return;
+        $("share-title").textContent = row.title;
+        $("share-lede").textContent = "A Drift live wallpaper. Open it in the app to try it on your phone.";
+        document.title = row.title + " - Drift live wallpaper";
+        var p = row.variants && row.variants.poster;
+        if (CDN_BASE && p && typeof p.key === "string" && (p.bucket == null || p.bucket === "public")) {
+          var img = $("poster");
+          img.src = CDN_BASE.replace(/\/+$/, "") + "/" + p.key.replace(/^\/+/, "");
+          img.onload = function () { img.hidden = false; };
+        }
+      })
+      .catch(function () {});
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>
