@@ -8,88 +8,78 @@
      Yayındaki kopya: https://foastudios.com/drift-hesap-silme/
      İletişim adresi main@foastudios.com. Hukuki danışmanlık değildir; düz dille yazıldı. -->
 <title>Delete your Drift account</title>
-<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../drift/icon.png" type="image/png">
+<meta name="theme-color" content="#050506">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800&family=Martian+Mono:wght@400&family=Schibsted+Grotesk:wght@400;600&display=swap">
+
 <style>
+  /* Drift tasarım sistemi (drift-android www/ds/tokens.css): OLED gece, sodyum lamba turuncusu, üç yazı tipi.
+     Dört Drift sayfasında (gizlilik, kurallar, telif, hesap silme) AYNI blok; /drift/ tanıtım sayfasıyla aynı dil. */
   :root{
-    --bg:#f5f4fb; --surface:#ffffff; --surface-2:#fbfaff;
-    --text:#1b1d29; --muted:#5b5e74; --faint:#6f7290;
-    --border:#e7e4f3; --accent:#5a4bd0; --accent-strong:#4636b8;
-    --good:#2f9e86; --glow:rgba(120,105,230,.10);
-    --shadow:0 1px 2px rgba(30,26,60,.05), 0 12px 30px rgba(40,32,90,.07);
-  }
-  @media (prefers-color-scheme:dark){
-    :root:not([data-theme="light"]){
-      --bg:#0f1119; --surface:#181b27; --surface-2:#13151f;
-      --text:#e9eaf2; --muted:#9a9db4; --faint:#8a8da6;
-      --border:#292c3b; --accent:#b3a8f2; --accent-strong:#c9c0ff;
-      --good:#6fd6c0; --glow:rgba(120,105,230,.16);
-      --shadow:0 1px 2px rgba(0,0,0,.3), 0 16px 40px rgba(0,0,0,.4);
-    }
-  }
-  :root[data-theme="dark"]{
-    --bg:#0f1119; --surface:#181b27; --surface-2:#13151f;
-    --text:#e9eaf2; --muted:#9a9db4; --faint:#8a8da6;
-    --border:#292c3b; --accent:#b3a8f2; --accent-strong:#c9c0ff;
-    --good:#6fd6c0; --glow:rgba(120,105,230,.16);
-    --shadow:0 1px 2px rgba(0,0,0,.3), 0 16px 40px rgba(0,0,0,.4);
+    --bg:#050506; --surface:#0e0e11; --surface-2:#17171b; --surface-3:#222228;
+    --text:#ecebe6; --muted:#a9a8a1; --faint:#8a8982;
+    --border:rgba(236,235,230,.10); --border-strong:rgba(236,235,230,.42);
+    --accent:#ffae57; --accent-strong:#ffbd73; --wash:rgba(255,174,87,.12); --on-accent:#1c0f02;
+    --good:#ffae57; --bad:#ff8f80;
+    --display:"Big Shoulders Display","Arial Narrow",sans-serif;
+    --sans:"Schibsted Grotesk",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:"Martian Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
   }
 
   *,*::before,*::after{box-sizing:border-box}
-  html{color-scheme:light dark;-webkit-text-size-adjust:100%}
+  html{color-scheme:dark;-webkit-text-size-adjust:100%}
   body{
     margin:0; color:var(--text); background:var(--bg);
-    background-image:radial-gradient(120% 80% at 50% -10%, var(--glow), transparent 60%);
-    background-attachment:fixed;
-    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    font-size:17px; line-height:1.65; letter-spacing:-0.003em;
+    background-image:radial-gradient(90% 50% at 50% -12%, rgba(255,174,87,.10), transparent 62%);
+    background-repeat:no-repeat;
+    font-family:var(--sans); font-size:17px; line-height:1.65;
     -webkit-font-smoothing:antialiased;
   }
-  .mono{font-family:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace}
+  .mono{font-family:var(--mono); font-size:.88em}
 
-  .page{max-width:660px; margin:0 auto; padding:56px 16px 72px;}
-  @media (min-width:560px){ .page{padding:72px 32px 88px} }
+  .page{max-width:680px; margin:0 auto; padding:40px 16px 72px;}
+  @media (min-width:560px){ .page{padding:56px 32px 88px} }
 
-  .brand{display:flex; align-items:center; gap:12px; margin-bottom:44px}
-  .mark{width:34px; height:34px; border-radius:9px; flex:none; position:relative;
-    background:linear-gradient(135deg,#3a3460,#17142b); box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
-  .mark span{position:absolute; left:22%; right:22%; height:2.6px; border-radius:3px;
-    background:linear-gradient(90deg,#b7afe6,#8b7ff0)}
-  .mark span:nth-child(1){top:33%} .mark span:nth-child(2){top:50%} .mark span:nth-child(3){top:67%}
-  .wordmark{font-weight:650; font-size:16.5px; letter-spacing:-0.01em}
-  .wordmark em{font-style:normal; color:var(--muted); font-weight:500}
+  .brand{display:flex; align-items:center; gap:12px; margin-bottom:48px}
+  .mark{width:34px; height:34px; border-radius:9px; flex:none; display:block;
+    background:url("../drift/icon.png") center/cover no-repeat, var(--surface-2)}
+  .mark span{display:none}
+  .wordmark{font:800 22px/1 var(--display); letter-spacing:.04em; text-transform:uppercase}
+  .wordmark em{font:400 15px/1 var(--sans); letter-spacing:0; text-transform:none; font-style:normal; color:var(--faint); margin-left:6px}
 
-  .eyebrow{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
-    text-transform:uppercase; letter-spacing:.16em; font-size:12px; color:var(--accent);
+  .eyebrow{font-family:var(--mono); text-transform:uppercase; letter-spacing:.14em; font-size:12px; color:var(--accent);
     margin:0 0 14px}
-  h1{font-size:clamp(2.1rem,6vw,2.9rem); line-height:1.06; letter-spacing:-0.03em;
-    font-weight:750; margin:0 0 18px; text-wrap:balance}
-  .lead{font-size:1.16rem; color:var(--muted); margin:0 0 26px; max-width:56ch}
+  h1{font:800 clamp(2.6rem,9vw,4rem)/.95 var(--display); text-transform:uppercase; letter-spacing:.01em;
+    margin:0 0 20px; text-wrap:balance}
+  .lead{font-size:1.14rem; color:var(--muted); margin:0 0 26px; max-width:56ch}
   .lead b{color:var(--text); font-weight:600}
 
   .chips{display:flex; flex-wrap:wrap; gap:9px; padding:0; margin:0 0 8px; list-style:none}
-  .chips li{display:inline-flex; align-items:center; gap:7px;
-    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace; font-size:12.5px;
+  .chips li{display:inline-flex; align-items:center; gap:8px;
+    font-family:var(--mono); font-size:12px;
     color:var(--text); background:var(--surface); border:1px solid var(--border);
-    padding:7px 12px; border-radius:999px; box-shadow:var(--shadow)}
-  .chips li::before{content:""; width:6px; height:6px; border-radius:50%; background:var(--good)}
+    padding:7px 12px; border-radius:999px}
+  .chips li::before{content:""; width:6px; height:6px; border-radius:2px; background:var(--accent)}
 
   .rule{height:1px; background:var(--border); border:0; margin:44px 0}
 
   section{margin:0}
-  h2{font-size:0.82rem; text-transform:uppercase; letter-spacing:.11em; font-weight:650;
+  h2{font-family:var(--mono); font-size:12px; text-transform:uppercase; letter-spacing:.14em; font-weight:400;
     color:var(--faint); margin:0 0 18px}
   .section-note{color:var(--muted); margin:-8px 0 20px; font-size:1.02rem}
 
-  .cards{display:grid; gap:14px}
+  .cards{display:grid; gap:12px}
   .card{display:grid; grid-template-columns:auto 1fr; gap:16px; align-items:start;
     background:var(--surface); border:1px solid var(--border); border-radius:16px;
-    padding:20px 22px; box-shadow:var(--shadow)}
+    padding:20px 22px}
   @media (max-width:420px){ .card{grid-template-columns:1fr; gap:12px; padding:18px} }
   .card-ic{width:38px; height:38px; border-radius:10px; display:grid; place-items:center;
-    background:var(--surface-2); border:1px solid var(--border); color:var(--accent)}
+    background:var(--wash); border:1px solid rgba(255,174,87,.25); color:var(--accent)}
   .card-ic svg{width:20px; height:20px; display:block}
-  .card h3{margin:2px 0 6px; font-size:1.04rem; font-weight:640; letter-spacing:-0.01em}
-  .card p{margin:0; color:var(--muted); font-size:0.99rem; line-height:1.6}
+  .card h3{margin:2px 0 6px; font-size:1.04rem; font-weight:600}
+  .card p{margin:0; color:var(--muted); font-size:.99rem; line-height:1.6}
   .card p + p{margin-top:8px}
 
   .checklist{list-style:none; padding:0; margin:0; display:grid; gap:13px}
@@ -102,64 +92,67 @@
   .minor{display:grid; gap:26px}
   .minor h2{margin-bottom:8px}
   .minor p{margin:0; color:var(--muted); font-size:1.02rem}
-  a{color:var(--accent-strong); text-underline-offset:2px}
-  a:hover{color:var(--accent)}
-  a:focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:3px}
+  a{color:var(--accent-strong); text-underline-offset:3px}
+  a:hover{color:var(--text)}
+  a:focus-visible{outline:3px solid var(--accent); outline-offset:3px; border-radius:4px}
 
   footer{margin-top:52px; padding-top:22px; border-top:1px solid var(--border);
-    color:var(--faint); font-size:0.86rem; display:flex; flex-wrap:wrap; gap:6px 16px}
+    color:var(--faint); font-size:.86rem; display:flex; flex-wrap:wrap; gap:6px 16px}
   footer .mono{color:var(--muted)}
 
   .page{animation:rise .5s cubic-bezier(.2,.7,.2,1) both}
   @keyframes rise{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:none}}
   @media (prefers-reduced-motion:reduce){ .page{animation:none} }
 
-  h2.big{font-size:1.28rem; text-transform:none; letter-spacing:-0.01em; color:var(--text); margin:0 0 12px; font-weight:680}
-  h3.sub{font-size:1.02rem; margin:22px 0 6px; font-weight:640}
+  h2.big{font:800 1.9rem/1 var(--display); text-transform:uppercase; letter-spacing:.01em; color:var(--text); margin:0 0 14px}
+  h3.sub{font-size:1.02rem; margin:22px 0 6px; font-weight:600}
   .prose p{margin:0 0 12px; color:var(--muted); font-size:1.02rem}
   .prose p b, .prose li b{color:var(--text); font-weight:600}
   .prose ul{margin:0 0 14px; padding-left:1.2em; color:var(--muted); font-size:1.02rem}
   .prose li{margin:0 0 7px}
-  .rules h2{font-size:1.05rem; text-transform:none; letter-spacing:-0.005em; color:var(--text); margin:30px 0 8px; font-weight:660}
+  .prose li::marker, .rules li::marker{color:var(--accent)}
+  .rules h2{font:800 1.6rem/1 var(--display); text-transform:uppercase; letter-spacing:.01em; color:var(--text); margin:34px 0 10px}
   .rules ul{margin:0; padding-left:1.2em; color:var(--muted)}
   .rules li{margin:0 0 7px}
-  .table-wrap{overflow-x:auto; margin:0 0 16px; border:1px solid var(--border); border-radius:14px; background:var(--surface); box-shadow:var(--shadow)}
-  table{border-collapse:collapse; width:100%; font-size:0.94rem}
+  .table-wrap{overflow-x:auto; margin:0 0 16px; border:1px solid var(--border); border-radius:14px; background:var(--surface)}
+  table{border-collapse:collapse; width:100%; font-size:.94rem}
   th,td{text-align:left; vertical-align:top; padding:11px 14px; border-bottom:1px solid var(--border)}
   tr:last-child td{border-bottom:0}
-  th{font-size:0.78rem; text-transform:uppercase; letter-spacing:.08em; color:var(--faint); font-weight:650; background:var(--surface-2)}
+  th{font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:.1em; color:var(--faint); font-weight:400; background:var(--surface-2)}
   td{color:var(--muted)} td:first-child{color:var(--text)}
-  .nav{display:flex; flex-wrap:wrap; gap:6px 18px; margin:-26px 0 38px; font-size:0.94rem}
-  .nav a[aria-current="page"]{color:var(--text); font-weight:600; text-decoration:none}
+  .nav{display:flex; flex-wrap:wrap; gap:8px; margin:-8px 0 38px; padding:0}
+  .nav a{font-size:.9rem; text-decoration:none; color:var(--muted); border:1px solid var(--border); border-radius:999px; padding:7px 13px; background:var(--surface)}
+  .nav a:hover{color:var(--text); border-color:var(--border-strong)}
+  .nav a[aria-current="page"]{color:var(--on-accent); background:var(--accent); border-color:var(--accent); font-weight:600}
   .langbox{margin-top:8px}
-  .note{background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--accent); border-radius:12px; padding:14px 16px; margin:0 0 18px; color:var(--muted); font-size:0.98rem}
+  .note{background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--accent); border-radius:12px; padding:14px 16px; margin:0 0 18px; color:var(--muted); font-size:.98rem}
   .note b{color:var(--text)}
   form{display:grid; gap:18px; margin:6px 0 10px}
   .field{display:grid; gap:6px}
-  label{font-weight:600; font-size:0.97rem}
-  label small{font-weight:400; color:var(--muted); font-size:0.9rem}
+  label{font-weight:600; font-size:.97rem}
+  label small{font-weight:400; color:var(--muted); font-size:.9rem}
   input[type=text],input[type=email],input[type=url],textarea{
     font:inherit; font-weight:400; color:var(--text); background:var(--surface); width:100%;
     border:1px solid var(--border); border-radius:11px; padding:11px 13px; -webkit-appearance:none; appearance:none}
+  input[type=text]:hover,input[type=email]:hover,input[type=url]:hover,textarea:hover{border-color:var(--border-strong)}
   textarea{min-height:132px; resize:vertical}
   input:focus-visible,textarea:focus-visible,button:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
-  input[aria-invalid="true"],textarea[aria-invalid="true"]{border-color:#c0392b}
-  .hint{font-weight:400; font-size:0.9rem; color:var(--muted); min-height:0}
-  .hint.err{color:#c0392b}
-  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .hint.err, :root:not([data-theme="light"]) input[aria-invalid="true"]{color:#ff8f80} }
+  input[aria-invalid="true"],textarea[aria-invalid="true"]{border-color:var(--bad)}
+  .hint{font-weight:400; font-size:.9rem; color:var(--muted); min-height:0}
+  .hint.err{color:var(--bad)}
   .check-row{display:grid; grid-template-columns:22px 1fr; gap:11px; align-items:start}
   .check-row label{font-weight:400}
-  .idnote{margin:0; border-left-color:var(--good)}
+  .idnote{margin:0; border-left-color:var(--accent)}
   .idnote a{font-weight:600}
-  .check-row input{width:20px; height:20px; margin:2px 0 0; accent-color:var(--accent-strong)}
-  button.go{font:inherit; font-weight:640; color:#fff; background:var(--accent-strong); border:0; border-radius:12px; padding:13px 20px; cursor:pointer; justify-self:start}
-  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) button.go{color:#14121f; background:var(--accent)} }
+  .check-row input{width:20px; height:20px; margin:2px 0 0; accent-color:var(--accent)}
+  button.go{font:inherit; font-weight:600; color:var(--on-accent); background:var(--accent); border:0; border-radius:14px; min-height:52px; padding:13px 22px; cursor:pointer; justify-self:start}
+  button.go:hover{filter:brightness(1.08)}
   button.go[disabled]{opacity:.55; cursor:default}
   #notice-form{display:none} .js #notice-form{display:grid}
   .result{margin:0; padding:14px 16px; border-radius:12px; border:1px solid var(--border); background:var(--surface); display:none}
   .result.show{display:block}
-  .result.good{border-color:var(--good)}
-  .result.bad{border-color:#c0392b}
+  .result.good{border-color:var(--accent)}
+  .result.bad{border-color:var(--bad)}
 </style>
 </head>
 <body>
