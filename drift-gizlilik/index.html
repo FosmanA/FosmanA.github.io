@@ -171,7 +171,7 @@
   <hr class="rule">
   <section class="prose">
     <h2>Without an account</h2>
-    <p>Browsing the library, previewing, saving wallpapers to your phone, setting them as your wallpaper and sending a report need no account. Your own imports (a GIF, photo or video you pick with Android's file picker) are copied to Drift's private storage on your phone and stay there. If you turn on the optional Parallax effect, Drift reads the accelerometer in real time for the effect only; these readings are never stored or sent. Drift Pro is bought and handled by Google Play; Drift only asks Google Play whether Pro is active. The purchase token is sent to Google Play to confirm Pro and is not stored. Reports and copyright notices sent without an account are stored (with no link to an account), because we need them to act on them.</p>
+    <p>Browsing the library, previewing, saving wallpapers to your phone, setting them as your wallpaper and sending a report need no account. Your own imports (a GIF, photo or video you pick with Android's file picker) are copied to Drift's private storage on your phone and stay there. If you turn on the optional Parallax effect, Drift reads the accelerometer in real time for the effect only; these readings are never stored or sent. Drift Pro is bought and handled by Google Play; Drift only asks Google Play whether Pro is active. The purchase token is sent to Google Play to confirm Pro. If you are signed in, a one-way digest of the purchase token, the product and the Pro end date are stored with your account so one purchase counts for one account; they are deleted with the account. Reports and copyright notices sent without an account are stored (with no link to an account), because we need them to act on them.</p>
   </section>
 
   <hr class="rule">
@@ -181,16 +181,25 @@
     <ul>
       <li><b>Account:</b> your Google e-mail address and name (kept by our sign-in service), the username you pick (public) and your <b>birth year</b> (private, only to check you are 13 or older).</li>
       <li><b>What you add:</b> the wallpapers you upload with their title, tags and source note, your likes, the people you block, your appeals, and the reports you send (a report with no account is stored without any account link).</li>
-      <li><b>Pro check:</b> the Google Play purchase token is sent to Google Play to confirm Pro; it is not stored.</li>
+      <li><b>Pro check:</b> the Google Play purchase token is sent to Google Play to confirm Pro, and a one-way digest of the purchase token, the product and the Pro end date are stored with your account so one purchase counts for one account; they are deleted with the account.</li>
       <li><b>Copyright notices</b> sent by rights holders: the name, e-mail address and reasoning they give us.</li>
     </ul>
-    <p>We use this to run the library, review uploads, handle reports and notices, and confirm Pro. We do not sell data, show ads or run analytics, tracking or crash-reporting SDKs. Drift does not read or store a device ID or an advertising ID.</p>
+    <p>We use this to run the library, review uploads, handle reports and notices, and confirm Pro. We do not sell data or run analytics, tracking or crash-reporting SDKs. Drift itself does not read or store a device ID or an advertising ID. The one exception is the optional ad described under <a href="#ads">Ads</a> below, which is handled by Google AdMob.</p>
   </section>
 
   <hr class="rule">
   <section class="prose">
     <h2>Technical data and your IP address</h2>
     <p>To stop abuse (for example a flood of reports from one network) the server limits how many reports and copyright notices one person can send per day. For people without an account that limit is counted per network address. <b>We don't store the raw IP address in our database</b>: only a daily one-way digest used for abuse limits is kept, and each such row is deleted after <b>7 days</b>. Our hosting providers (Supabase, Cloudflare) may keep standard request logs for a short time. Download counts are kept as a plain total with no link to anyone.</p>
+  </section>
+
+  <hr class="rule">
+  <section class="prose" id="ads">
+    <h2>Ads (only if you choose to watch one)</h2>
+    <p>Drift shows no ads while you browse, preview or set wallpapers. Your first upload is free. After that you can watch one short ad to earn one upload, or use Drift Pro to upload without ads. An ad only plays when you tap to watch it.</p>
+    <p>The ad is served by <b>Google AdMob</b> (Google LLC). To show the ad, limit how often it appears, prevent fraud and measure it, AdMob may collect your device's <b>advertising ID</b>, an approximate location derived from your IP address, device and app information, and how you interact with the ad. Google handles this under <a href="https://policies.google.com/technologies/partner-sites">its own policy for partner apps</a>. Drift does not use it for anything else.</p>
+    <p><b>Your choice.</b> In the EU, the UK and Switzerland, a consent message (Google's User Messaging Platform) is shown before the first ad. You can change your choice at any time in <b>Settings &rarr; Privacy choices</b>. Without consent, ads are <b>non-personalized</b>. You can also reset your advertising ID in your Android settings.</p>
+    <p><b>Confirming your reward.</b> When you finish an ad, AdMob sends a signed confirmation straight to our server (server-to-server) with a one-time code. Drift stores that transaction ID and the time, linked to your account, to grant exactly one upload and to ignore repeats. It is kept like the rest of your account data and deleted when you delete the account.</p>
   </section>
 
   <hr class="rule">
@@ -202,9 +211,9 @@
       <tr><td>Your original upload file, once the wallpaper is approved</td><td>deleted 7 days after approval</td></tr>
       <tr><td>Rejected or removed wallpapers (kept so you can appeal, and for legal requests)</td><td>files are deleted after 90 days; the title, tags and a content fingerprint stay, so the same file can't be uploaded again (the link to the uploader is removed when the account is deleted)</td></tr>
       <tr><td>Moderation log (decisions, strikes), copyright notices</td><td>1 year</td></tr>
-      <tr><td>Strikes and bans of a deleted account, stored as a one-way fingerprint of the Google account</td><td>1 year</td></tr>
+      <tr><td>Strikes, bans and the used free first upload of a deleted account, stored as a one-way fingerprint of the Google account</td><td>1 year</td></tr>
       <tr><td>Resolved reports (upheld or dismissed)</td><td>deleted 1 year after they are handled. Open reports are kept until a moderator handles them.</td></tr>
-      <tr><td>Account, profile, likes, blocks, appeals</td><td>until you delete the account</td></tr>
+      <tr><td>Account, profile, likes, blocks, appeals, the ad reward confirmations (transaction ID and time) and the Pro purchase link (token digest, product, end date)</td><td>until you delete the account</td></tr>
     </table></div>
   </section>
 
@@ -216,17 +225,18 @@
       <li><b>Supabase</b> (EU region): accounts, sign-in and the database.</li>
       <li><b>Cloudflare:</b> storage (R2) and queues for uploaded files, and delivery of wallpapers.</li>
       <li><b>Google Cloud</b> (EU region): the worker that converts uploads, and <b>Cloud Vision</b>, which scans frames for unsafe content.</li>
+      <li><b>Google AdMob</b> (Google LLC): the optional ad that earns an upload, and the signed reward confirmation.</li>
       <li><b>Google Play:</b> purchases, and its billing component's own diagnostics under <a href="https://policies.google.com/privacy">Google's privacy policy</a>.</li>
     </ul>
-    <p>Some of these providers (Google Play, Cloudflare) may process data outside the EU under their standard safeguards. Public wallpapers and the username of the uploader are visible to everyone.</p>
+    <p>Some of these providers (Google Play, Google AdMob, Cloudflare) may process data outside the EU under their standard safeguards. Public wallpapers and the username of the uploader are visible to everyone.</p>
     <p><b>Data controller: FOA Studios, main@foastudios.com</b></p>
   </section>
 
   <hr class="rule">
   <section class="prose">
     <h2>Your rights and deleting your account</h2>
-    <p>You can see, correct and delete your data. The quickest way is in the app: <b>Upload &rarr; Account &rarr; Delete account</b>. That removes your profile, likes, blocks and appeals, takes your wallpapers down and removes them from other phones. If you cannot use the app, <a href="../drift-hesap-silme/">ask by e-mail</a>.</p>
-    <p>Also kept after deletion (besides the wallpaper records above, which no longer point to you): if your account had strikes or was banned, a one-way fingerprint of your Google account is kept for <b>1 year</b> together with the strike count, so a closed account cannot simply come back. The fingerprint cannot be turned back into your e-mail or name.</p>
+    <p>You can see, correct and delete your data. The quickest way is in the app: <b>Upload &rarr; Account &rarr; Delete account</b>. That removes your profile, likes, blocks, appeals, ad reward confirmations and the Pro purchase link, takes your wallpapers down and removes them from other phones. If you cannot use the app, <a href="../drift-hesap-silme/">ask by e-mail</a>.</p>
+    <p>Also kept after deletion (besides the wallpaper records above, which no longer point to you): if your account had strikes or was banned, or had used its free first upload (so it is not given again), a one-way fingerprint of your Google account is kept for <b>1 year</b> together with the strike count, so a closed account cannot simply come back. The fingerprint cannot be turned back into your e-mail or name.</p>
     <p>Under the EU GDPR and Turkey's KVKK you also have the right to ask for access, correction, deletion and restriction, to object, and to complain to your data protection authority. Write to <a href="mailto:main@foastudios.com">main@foastudios.com</a>.</p>
   </section>
 
@@ -247,17 +257,18 @@
   <section class="prose langbox" lang="tr">
     <h2 class="big">Gizlilik Politikası (Türkçe özet)</h2>
     <p><b>Hesapsız kullanımda Drift sizin hakkınızda bir profil tutmaz.</b> Hesapsız gönderilen şikâyetler ve telif bildirimleri (bir hesaba bağlanmadan) saklanır. Hesap yalnız topluluk kütüphanesinde yükleme, beğenme, engelleme ve itiraz için gerekir.</p>
-    <p><b>Hesapla saklananlar:</b> Google e-posta ve adınız (giriş hizmetimizde), seçtiğiniz kullanıcı adı (herkese açık), doğum yılınız (gizli, yalnız 13 yaşını doğrulamak için), yüklediğiniz duvar kağıtları, beğeniler, engellemeler, itirazlar, gönderdiğiniz şikâyetler ve Pro doğrulaması için satın alma belirteci (Google Play'e gönderilir, saklanmaz). Reklam, analitik, izleme ya da çökme raporu SDK'sı yoktur; cihaz kimliği ve reklam kimliği toplanmaz; veri satılmaz.</p>
+    <p><b>Hesapla saklananlar:</b> Google e-posta ve adınız (giriş hizmetimizde), seçtiğiniz kullanıcı adı (herkese açık), doğum yılınız (gizli, yalnız 13 yaşını doğrulamak için), yüklediğiniz duvar kağıtları, beğeniler, engellemeler, itirazlar, gönderdiğiniz şikâyetler. Pro doğrulaması için satın alma belirteci Google Play'e gönderilir; bir satın alım tek bir hesapta sayılsın diye belirtecin tek yönlü özeti, ürün ve Pro bitiş tarihi hesabınızla saklanır ve hesapla birlikte silinir. Analitik, izleme ya da çökme raporu SDK'sı yoktur; veri satılmaz. Drift'in kendisi cihaz kimliği ya da reklam kimliği okumaz veya saklamaz; tek istisna aşağıdaki isteğe bağlı reklamdır ve onu Google AdMob yönetir.</p>
+    <p><b>Reklamlar (yalnız izlemeyi seçerseniz):</b> Drift gezinirken, önizlerken ya da duvar kağıdı ayarlarken reklam göstermez. İlk yüklemeniz ücretsizdir; sonrasında bir yükleme hakkı için kısa bir reklam izleyebilir ya da Drift Pro ile reklamsız yükleyebilirsiniz. Reklam yalnız izlemeye dokunduğunuzda oynar. Reklamı <b>Google AdMob</b> (Google LLC) sunar; reklamı göstermek, sıklığını sınırlamak, sahtecilikle mücadele etmek ve ölçmek için cihazınızın <b>reklam kimliğini</b>, IP adresinden türetilen yaklaşık konumu, cihaz ve uygulama bilgisini ve reklamla etkileşiminizi toplayabilir (<a href="https://policies.google.com/technologies/partner-sites">Google'ın iş ortağı uygulamalar politikası</a>). AB, Birleşik Krallık ve İsviçre'de ilk reklamdan önce bir onay iletisi (Google UMP) gösterilir; seçiminizi <b>Settings &rarr; Privacy choices</b> (Gizlilik seçenekleri) bölümünden istediğiniz zaman değiştirebilirsiniz. Onay vermezseniz reklamlar <b>kişiselleştirilmemiş</b> olur. Reklam bitince AdMob sunucumuza imzalı bir onay (tek kullanımlık kodla) gönderir; Drift bu işlem kimliğini ve zamanı, tek bir yükleme hakkı vermek için hesabınıza bağlı olarak saklar ve hesap silinince siler.</p>
     <p><b>IP adresi:</b> kötüye kullanımı sınırlamak için günlük şikâyet ve telif bildirimi sayısı sayılır. Ham IP adresini veritabanımızda saklamayız; yalnız kötüye kullanım sınırı için günlük tek yönlü bir özet tutulur ve <b>7 gün</b> sonra silinir. Barındırma sağlayıcılarımız (Supabase, Cloudflare) kısa süre standart istek günlüklerini tutabilir.</p>
-    <p><b>Saklama:</b> onaylanan yüklemenin ham dosyası onaydan 7 gün sonra silinir; reddedilen/kaldırılan içeriğin dosyaları itiraz için 90 gün arşivde tutulur, dosyaları 90 gün sonra silinir; aynı dosya yeniden yüklenemesin diye kaydın başlığı, etiketleri ve içerik parmak izi kalır (hesap silinince kaydın yükleyene bağlantısı kaldırılır); moderasyon kaydı ve telif bildirimleri <b>1 yıl</b> tutulur; sonuçlanmış şikâyetler işlendikten 1 yıl sonra silinir, açık olanlar bir moderatör işleyene dek kalır; hesabınızı silerseniz profil, beğeni, engelleme ve itirazlarınız silinir.</p>
-    <p><b>Silinmiş hesapta kalan:</b> uyarısı ya da yasağı olan bir hesap silinirse, kapatılan hesabın geri dönememesi için Google hesabının tek yönlü parmak izi ve uyarı sayısı <b>1 yıl</b> tutulur. Bu izden e-postanız ya da adınız geri çıkarılamaz.</p>
-    <p><b>Hizmet sağlayıcılar:</b> Supabase (AB), Cloudflare (R2, kuyruklar), Google Cloud (AB; yükleme işleme ve Cloud Vision ile güvenlik taraması), Google Play (satın alma).</p>
-    <p><b>Veri sorumlusu:</b> FOA Studios, main@foastudios.com. Bazı sağlayıcılar (Google Play, Cloudflare) verileri standart güvenceleriyle AB dışında işleyebilir.</p>
+    <p><b>Saklama:</b> onaylanan yüklemenin ham dosyası onaydan 7 gün sonra silinir; reddedilen/kaldırılan içeriğin dosyaları itiraz için 90 gün arşivde tutulur, dosyaları 90 gün sonra silinir; aynı dosya yeniden yüklenemesin diye kaydın başlığı, etiketleri ve içerik parmak izi kalır (hesap silinince kaydın yükleyene bağlantısı kaldırılır); moderasyon kaydı ve telif bildirimleri <b>1 yıl</b> tutulur; sonuçlanmış şikâyetler işlendikten 1 yıl sonra silinir, açık olanlar bir moderatör işleyene dek kalır; hesabınızı silerseniz profil, beğeni, engelleme ve itirazlarınız, reklam ödülü onaylarınız ve Pro satın alma bağlantınız silinir.</p>
+    <p><b>Silinmiş hesapta kalan:</b> uyarısı ya da yasağı olan ya da ilk ücretsiz yüklemesini kullanmış bir hesap silinirse, kapatılan hesap geri dönemesin ve ilk ücretsiz yükleme yeniden verilmesin diye Google hesabının tek yönlü parmak izi ve uyarı sayısı <b>1 yıl</b> tutulur. Bu izden e-postanız ya da adınız geri çıkarılamaz.</p>
+    <p><b>Hizmet sağlayıcılar:</b> Supabase (AB), Cloudflare (R2, kuyruklar), Google Cloud (AB; yükleme işleme ve Cloud Vision ile güvenlik taraması), Google Play (satın alma), Google AdMob (isteğe bağlı ödüllü reklam).</p>
+    <p><b>Veri sorumlusu:</b> FOA Studios, main@foastudios.com. Bazı sağlayıcılar (Google Play, Google AdMob, Cloudflare) verileri standart güvenceleriyle AB dışında işleyebilir.</p>
     <p><b>Haklarınız:</b> KVKK ve GDPR kapsamında erişim, düzeltme, silme, itiraz ve şikâyet haklarınız vardır. Uygulamada <b>Upload &rarr; Account &rarr; Delete account</b> ile hesabınızı silebilir ya da <a href="mailto:main@foastudios.com">main@foastudios.com</a> adresine yazabilirsiniz. Hesap ve yükleme için en düşük yaş 13'tür.</p>
   </section>
 
   <footer>
-    <span class="mono">Last updated 24 October 2026</span>
+    <span class="mono">Last updated 26 October 2026</span>
     <span>© 2026 <a href="https://foastudios.com/">FOA Studios</a> · Drift Live Wallpapers</span>
   </footer>
 </main>
