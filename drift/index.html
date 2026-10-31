@@ -13,7 +13,7 @@
 <meta property="og:image" content="https://foastudios.com/drift/in-1080p.webp">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=Martian+Mono:wght@400&family=Schibsted+Grotesk:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@300;700;800&family=Martian+Mono:wght@400&family=Schibsted+Grotesk:wght@400;600&display=swap">
 <!-- Drift tanıtım sayfası. Renkler ve yazı tipleri uygulamanın tasarım sisteminden (drift-android www/ds/tokens.css):
      OLED gece zemini, sodyum lamba turuncusu, Big Shoulders / Schibsted Grotesk / Martian Mono. Ekran görüntüleri
      drift-android store/1.7/screens'ten kırpıldı (mağaza girişiyle aynı demo içerik, CC0). Metin mağaza girişine
@@ -66,6 +66,8 @@
     filter:blur(10px);pointer-events:none}
   .phone{position:relative;display:block;width:100%;height:auto;border-radius:34px 34px 8px 8px;
     border:1px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.6)}
+  canvas.phone{width:100%;aspect-ratio:480/827;height:auto;background:#050506;touch-action:pan-y;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .hint{position:relative;margin:16px 0 0;text-align:center;color:var(--ink-3)}
 
   /* screens */
   section{padding:56px 0;border-top:1px solid var(--line)}
@@ -148,8 +150,9 @@
         </div>
       </div>
       <div class="stage">
-        <img class="phone" src="in-1080p.webp" width="480" height="827" data-i18n-alt="heroAlt"
-             alt="Drift on a phone: a moonlit field playing under the lock-screen clock, with speed and size sliders">
+        <canvas class="phone" id="live" width="480" height="827" role="img" data-i18n-aria="liveAlt"
+                aria-label="A live wallpaper under the lock-screen clock: rain falling through a street lamp's light over a sleeping city"></canvas>
+        <p class="hint mono" data-i18n="hint">Move or swipe it · tap for ripples</p>
       </div>
     </div>
 
@@ -241,7 +244,8 @@
       by: "by FOA Studios", eyebrow: "Live wallpapers for Android",
       lede: "<strong>A library of living wallpapers</strong> for your home and lock screen: short loops shared by people. Or make your own from the photos, GIFs and videos on your phone.",
       play: "Get it on Google Play", inside: "See what's inside",
-      heroAlt: "Drift on a phone: a moonlit field playing under the lock-screen clock, with speed and size sliders",
+      liveAlt: "A live wallpaper under the lock-screen clock: rain falling through a street lamp's light over a sleeping city",
+      hint: "Move or swipe it · tap for ripples",
       insideH: "Inside the app", insideSub: "Browse and preview the whole library for free, without an account.",
       c1: "Discover", d1: "Featured, New and Popular, with categories and search.",
       c2: "Up to 1080p", d2: "Set any wallpaper with Drift Pro, in 1080p where your phone supports it.",
@@ -280,7 +284,8 @@
       by: "FOA Studios'tan", eyebrow: "Android için canlı duvar kağıtları",
       lede: "Ana ekranın ve kilit ekranın için <strong>canlı duvar kağıtları kütüphanesi</strong>: insanların paylaştığı kısa döngüler. Ya da telefonundaki fotoğraf, GIF ve videolardan kendininkini yap.",
       play: "Google Play'den indir", inside: "İçinde neler var",
-      heroAlt: "Telefonda Drift: kilit ekranı saatinin altında oynayan ay ışıklı bir çayır, hız ve boyut kaydırıcılarıyla",
+      liveAlt: "Kilit ekranı saatinin altında canlı bir duvar kağıdı: uyuyan bir şehrin üstünde, sokak lambasının ışığında yağan yağmur",
+      hint: "Gezdir ya da kaydır · dokun, halka açılsın",
       insideH: "Uygulamanın içi", insideSub: "Kütüphanenin tamamına hesapsız ve ücretsiz göz at, önizle.",
       c1: "Keşfet", d1: "Öne çıkanlar, Yeniler ve Popüler; kategoriler ve arama.",
       c2: "1080p'ye kadar", d2: "Drift Pro ile her duvar kağıdını, telefonun destekliyorsa 1080p kur.",
@@ -326,6 +331,7 @@
     document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t[el.dataset.i18n]; });
     document.querySelectorAll('[data-i18n-html]').forEach(el => { el.innerHTML = t[el.dataset.i18nHtml]; });
     document.querySelectorAll('[data-i18n-alt]').forEach(el => { el.alt = t[el.dataset.i18nAlt]; });
+    document.querySelectorAll('[data-i18n-aria]').forEach(el => { el.setAttribute('aria-label', t[el.dataset.i18nAria]); });
     document.querySelector('meta[name="description"]').content = t.desc;
     btn.textContent = t.other;
     btn.setAttribute('aria-label', t.otherLabel);
@@ -336,6 +342,230 @@
     applyLang(lang);
     try { localStorage.setItem('lang', lang); } catch (e) {}
   });
+})();
+</script>
+<script>
+// Hero: a small live wallpaper under the lock-screen clock. Rain falls through a sodium street lamp's light over a sleeping city.
+// It does what the app does (parallax when you move, swipe or tilt; rings where you tap) and keeps the app's battery manners:
+// capped at 30 FPS, stopped when it scrolls out of view or the tab is hidden, still under reduced motion unless you touch it.
+(() => {
+  const cv = document.getElementById('live');
+  const ctx = cv.getContext('2d');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let W, H, d, GY, lamp, city, stars, drops, splashes = [], rings = [];
+  const par = { x: 0, y: 0, tx: 0, ty: 0 };   // parallax now and target, -1..1
+  let userUntil = 0, activeUntil = 0, nextFlicker = 0;
+  let seed = 7;
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const pad2 = n => String(n).padStart(2, '0');
+
+  function newDrop(anywhere) {
+    return { x: -0.1 * W + Math.random() * 1.2 * W, y: anywhere ? Math.random() * GY : -Math.random() * H * 0.3,
+             v: H * (0.9 + Math.random() * 0.45), len: H * (0.018 + Math.random() * 0.02) };
+  }
+
+  function setup() {
+    d = Math.min(2, window.devicePixelRatio || 1);
+    W = Math.max(1, Math.round(cv.clientWidth * d));
+    H = Math.max(1, Math.round(cv.clientHeight * d));
+    cv.width = W; cv.height = H;
+    GY = H * 0.8;
+    lamp = { x: W * 0.72, top: H * 0.41, hx: W * 0.58, hy: H * 0.425 };
+    seed = 7;
+    city = [];
+    for (let x = -0.12 * W; x < 1.12 * W;) {
+      const w = W * (0.07 + rnd() * 0.1), h = H * (0.09 + rnd() * 0.2);
+      const cols = Math.max(1, Math.floor(w / (W * 0.032))), rows = Math.max(1, Math.floor(h / (H * 0.024)));
+      const wins = [];
+      for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+        if (rnd() < 0.2) wins.push({ c, r, warm: rnd() < 0.75, on: true });
+      }
+      city.push({ x, w, h, cols, rows, wins, tone: rnd() < 0.5 ? '#0d0d10' : '#111115' });
+      x += w + W * 0.004;
+    }
+    stars = Array.from({ length: 46 }, () => ({ x: -0.1 * W + rnd() * 1.2 * W, y: rnd() * H * 0.55, s: rnd() < 0.2 ? 2 : 1, p: rnd() * 6.28 }));
+    drops = Array.from({ length: 150 }, () => newDrop(true));
+  }
+
+  function cone() {
+    ctx.beginPath();
+    ctx.moveTo(lamp.hx - W * 0.025, lamp.hy + H * 0.008);
+    ctx.lineTo(lamp.hx + W * 0.025, lamp.hy + H * 0.008);
+    ctx.lineTo(lamp.hx + W * 0.24, GY);
+    ctx.lineTo(lamp.hx - W * 0.3, GY);
+    ctx.closePath();
+  }
+
+  function update(dt, now) {
+    const idle = now > userUntil;
+    if (idle) { par.tx = Math.sin(now / 4200) * 0.55; par.ty = Math.sin(now / 5300) * 0.3; }
+    const k = Math.min(1, dt * (idle ? 1.5 : 5));
+    par.x += (par.tx - par.x) * k; par.y += (par.ty - par.y) * k;
+    if (reduce) return;
+    for (const p of drops) {
+      p.y += p.v * dt; p.x += p.v * dt * 0.1;
+      if (p.y > GY) {
+        if (p.x > lamp.hx - W * 0.3 && p.x < lamp.hx + W * 0.24 && Math.random() < 0.5) splashes.push({ x: p.x, t: now });
+        Object.assign(p, newDrop(false));
+      }
+    }
+    splashes = splashes.filter(s => now - s.t < 260);
+    if (now > nextFlicker) {
+      const b = city[(Math.random() * city.length) | 0];
+      if (b.wins.length) { const w = b.wins[(Math.random() * b.wins.length) | 0]; w.on = !w.on; }
+      nextFlicker = now + 1200 + Math.random() * 2600;
+    }
+  }
+
+  function draw(now) {
+    const shift = depth => [par.x * depth * W * 0.05, par.y * depth * H * 0.012];
+    const sky = ctx.createLinearGradient(0, 0, 0, GY);
+    sky.addColorStop(0, '#050506'); sky.addColorStop(1, '#0c0b0e');
+    ctx.fillStyle = sky; ctx.fillRect(0, 0, W, H);
+
+    // stars, far away
+    let [sx, sy] = shift(0.15);
+    ctx.fillStyle = '#8a8982';
+    for (const s of stars) {
+      ctx.globalAlpha = reduce ? 0.45 : 0.3 + 0.3 * Math.sin(now / 1100 + s.p);
+      ctx.fillRect(Math.round(s.x + sx), Math.round(s.y + sy), s.s * d, s.s * d);
+    }
+    ctx.globalAlpha = 1;
+
+    // the city, mid distance
+    [sx, sy] = shift(0.45);
+    for (const b of city) {
+      const bx = b.x + sx, by = GY - b.h + sy;
+      ctx.fillStyle = b.tone; ctx.fillRect(bx, by, b.w, b.h + H);
+      const cw = b.w / b.cols, ch = b.h / b.rows;
+      for (const w of b.wins) {
+        if (!w.on) continue;
+        ctx.fillStyle = w.warm ? 'rgba(255,174,87,.55)' : 'rgba(170,190,230,.28)';
+        ctx.fillRect(bx + w.c * cw + cw * 0.3, by + w.r * ch + ch * 0.3, Math.max(d, cw * 0.4), Math.max(d, ch * 0.4));
+      }
+    }
+
+    // the street, the lamp and its rain, near
+    [sx, sy] = shift(1);
+    ctx.save(); ctx.translate(sx, sy);
+    ctx.fillStyle = '#070708'; ctx.fillRect(-W, GY, 3 * W, H);
+    const pool = ctx.createRadialGradient(lamp.hx, GY + (H - GY) * 0.3, 0, lamp.hx, GY + (H - GY) * 0.3, W * 0.4);
+    pool.addColorStop(0, 'rgba(255,174,87,.26)'); pool.addColorStop(1, 'rgba(255,174,87,0)');
+    ctx.fillStyle = pool; ctx.fillRect(-W, GY, 3 * W, H);
+    // the lamp's reflection on the wet street
+    const sh = reduce ? 1 : 0.85 + 0.15 * Math.sin(now / 180);
+    const refl = ctx.createLinearGradient(0, GY, 0, H);
+    refl.addColorStop(0, `rgba(255,189,115,${0.45 * sh})`); refl.addColorStop(1, 'rgba(255,189,115,0)');
+    ctx.fillStyle = refl; ctx.fillRect(lamp.hx - W * 0.012, GY, W * 0.024, H - GY);
+
+    cone();
+    const beam = ctx.createLinearGradient(0, lamp.hy, 0, GY);
+    beam.addColorStop(0, 'rgba(255,174,87,.24)'); beam.addColorStop(1, 'rgba(255,174,87,.05)');
+    ctx.fillStyle = beam; ctx.fill();
+
+    // rain: barely there in the dark, lit inside the beam
+    ctx.lineWidth = Math.max(1, d * 0.9);
+    ctx.strokeStyle = 'rgba(200,205,220,.07)';
+    ctx.beginPath();
+    for (const p of drops) { ctx.moveTo(p.x, p.y); ctx.lineTo(p.x - p.len * 0.1, p.y - p.len); }
+    ctx.stroke();
+    ctx.save(); cone(); ctx.clip();
+    ctx.strokeStyle = 'rgba(255,218,170,.6)';
+    ctx.beginPath();
+    for (const p of drops) { ctx.moveTo(p.x, p.y); ctx.lineTo(p.x - p.len * 0.1, p.y - p.len); }
+    ctx.stroke();
+    ctx.restore();
+    ctx.fillStyle = 'rgba(255,218,170,.7)';
+    for (const s of splashes) {
+      const a = (now - s.t) / 260, r = W * 0.008 * (0.5 + a);
+      ctx.globalAlpha = 1 - a;
+      ctx.fillRect(s.x - r, GY - r * 0.6, d, d); ctx.fillRect(s.x + r, GY - r * 0.6, d, d);
+    }
+    ctx.globalAlpha = 1;
+
+    // pole, arm, head and glow
+    ctx.fillStyle = '#16161a';
+    ctx.fillRect(lamp.x - W * 0.006, lamp.top, W * 0.012, GY - lamp.top);
+    ctx.fillRect(lamp.hx, lamp.top - W * 0.006, lamp.x - lamp.hx, W * 0.01);
+    ctx.fillRect(lamp.hx - W * 0.03, lamp.hy - H * 0.012, W * 0.06, H * 0.014);
+    const glow = ctx.createRadialGradient(lamp.hx, lamp.hy, 0, lamp.hx, lamp.hy, W * 0.2);
+    glow.addColorStop(0, 'rgba(255,190,120,.55)'); glow.addColorStop(0.25, 'rgba(255,174,87,.18)'); glow.addColorStop(1, 'rgba(255,174,87,0)');
+    ctx.fillStyle = glow; ctx.fillRect(lamp.hx - W * 0.2, lamp.hy - W * 0.2, W * 0.4, W * 0.4);
+    ctx.fillStyle = '#ffd9a8';
+    ctx.fillRect(lamp.hx - W * 0.022, lamp.hy, W * 0.044, H * 0.005);
+    ctx.restore();
+
+    // the lock-screen clock stays put, like the real one
+    const lang = document.documentElement.lang === 'tr' ? 'tr' : 'en';
+    const t = new Date(), h = t.getHours();
+    const time = (lang === 'tr' ? pad2(h) : String(h % 12 || 12)) + ':' + pad2(t.getMinutes());
+    ctx.fillStyle = '#ecebe6'; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    ctx.font = `300 ${Math.round(W * 0.24)}px "Big Shoulders Display", "Arial Narrow", sans-serif`;
+    ctx.fillText(time, W / 2, H * 0.2);
+    ctx.font = `400 ${Math.round(W * 0.042)}px "Schibsted Grotesk", system-ui, sans-serif`;
+    ctx.fillStyle = 'rgba(236,235,230,.8)';
+    ctx.fillText(t.toLocaleDateString(lang, { weekday: 'short', day: 'numeric', month: 'short' }), W / 2, H * 0.245);
+
+    // touch ripples: two rings from where you tapped
+    ctx.lineWidth = 2 * d;
+    for (const r of rings) {
+      for (let i = 0; i < 2; i++) {
+        const age = (now - r.t) / 1000 - i * 0.18;
+        if (age <= 0 || age >= 1.1) continue;
+        const e = 1 - Math.pow(1 - age / 1.1, 3);
+        ctx.strokeStyle = `rgba(255,189,115,${(1 - age / 1.1) * 0.8})`;
+        ctx.beginPath(); ctx.arc(r.x, r.y, W * 0.03 + e * W * 0.4, 0, Math.PI * 2); ctx.stroke();
+      }
+    }
+    rings = rings.filter(r => now - r.t < 1300);
+  }
+
+  // 30 FPS cap; nothing runs while the hero is off screen or the tab is hidden
+  let visible = true, raf = 0, last = 0, lastDraw = 0;
+  function frame(t) {
+    raf = 0;
+    if (!visible || document.hidden || (reduce && t > activeUntil)) return;
+    raf = requestAnimationFrame(frame);
+    if (t - lastDraw < 1000 / 30 - 2) return;
+    const dt = Math.min(0.1, (t - (last || t)) / 1000);
+    last = t; lastDraw = t;
+    update(dt, t); draw(t);
+  }
+  function start() {
+    if (raf || !visible || document.hidden || (reduce && performance.now() > activeUntil)) return;
+    last = 0; raf = requestAnimationFrame(frame);
+  }
+  function wake(ms) { userUntil = performance.now() + 2500; activeUntil = Math.max(activeUntil, performance.now() + ms); start(); }
+  const clamp = v => Math.max(-1, Math.min(1, v));
+
+  setup(); draw(performance.now());
+  if (document.fonts) document.fonts.ready.then(() => draw(performance.now()));
+  new ResizeObserver(() => {
+    if (Math.round(cv.clientWidth * Math.min(2, window.devicePixelRatio || 1)) !== W) { setup(); draw(performance.now()); }
+  }).observe(cv);
+  new IntersectionObserver(e => { visible = e[0].isIntersecting; start(); }).observe(cv);
+  document.addEventListener('visibilitychange', start);
+  // the clock keeps time even when nothing else moves
+  setInterval(() => { if (!raf && visible && !document.hidden) draw(performance.now()); }, 15000);
+
+  cv.addEventListener('pointermove', e => {
+    const r = cv.getBoundingClientRect();
+    par.tx = clamp(((e.clientX - r.left) / r.width - 0.5) * 2);
+    par.ty = clamp(((e.clientY - r.top) / r.height - 0.5) * 2);
+    wake(2500);
+  });
+  cv.addEventListener('pointerdown', e => {
+    const r = cv.getBoundingClientRect();
+    rings.push({ x: (e.clientX - r.left) * (W / r.width), y: (e.clientY - r.top) * (H / r.height), t: performance.now() });
+    wake(1400);
+  });
+  window.addEventListener('deviceorientation', e => {
+    if (e.gamma == null || !visible) return;
+    par.tx = clamp(e.gamma / 25); par.ty = clamp(((e.beta || 45) - 45) / 30);
+    userUntil = performance.now() + 2500;
+    if (!reduce) start();
+  });
+  start();
 })();
 </script>
 </body>
