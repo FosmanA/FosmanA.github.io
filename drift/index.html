@@ -350,7 +350,8 @@
 <script>
 // Hero: Drift's lock screen playing real loops from the library (public teasers on the CDN), one after another like a playlist.
 // On top, what the app adds: parallax when you move, swipe or tilt, and rings where you tap. Battery manners as in the app:
-// nothing plays while the hero is off screen or the tab is hidden; under reduced motion it shows still posters and moves only when touched.
+// nothing plays while the hero is off screen or the tab is hidden. The loops are the product, so they play under reduced motion too;
+// only the idle parallax drift is left out then.
 (() => {
   const CDN = 'https://cdn.foastudios.com/w/';
   const WALLS = [
@@ -376,7 +377,7 @@
 
   function load(v, i) {
     v.poster = CDN + WALLS[i] + '/poster_sm.webp';
-    if (!reduce) v.src = CDN + WALLS[i] + '/teaser.mp4';
+    v.src = CDN + WALLS[i] + '/teaser.mp4';
   }
   function show(i) {
     const back = vids[1 - front];
@@ -387,7 +388,6 @@
       setTimeout(() => { if (!old.classList.contains('on')) old.pause(); }, 900);
       front = 1 - front; cur = i;
     };
-    if (reduce) { swap(); return; }
     back.play().then(swap, swap);
   }
 
@@ -441,7 +441,7 @@
   }
   function start() {
     if (raf || !visible || document.hidden) return;
-    if (!reduce) vids[front].play().catch(() => {});
+    vids[front].play().catch(() => {});
     last = 0; raf = requestAnimationFrame(frame);
   }
   function stop() { for (const v of vids) v.pause(); }
@@ -455,7 +455,7 @@
   document.addEventListener('visibilitychange', () => { document.hidden ? stop() : start(); });
   setInterval(() => { if (!raf && visible && !document.hidden) drawUI(performance.now()); }, 15000);
   // the playlist: the next loop every few seconds, only while someone can see it
-  setInterval(() => { if (!reduce && visible && !document.hidden) show((cur + 1) % WALLS.length); }, HOLD);
+  setInterval(() => { if (visible && !document.hidden) show((cur + 1) % WALLS.length); }, HOLD);
 
   box.addEventListener('pointermove', e => {
     const r = box.getBoundingClientRect();
@@ -466,8 +466,6 @@
   box.addEventListener('pointerdown', e => {
     const r = box.getBoundingClientRect();
     rings.push({ x: (e.clientX - r.left) * (W / r.width), y: (e.clientY - r.top) * (H / r.height), t: performance.now() });
-    // under reduced motion the loop plays only when asked for
-    if (reduce && !vids[front].src) { vids[front].src = CDN + WALLS[cur] + '/teaser.mp4'; vids[front].play().catch(() => {}); }
     start();
   });
   window.addEventListener('deviceorientation', e => {
