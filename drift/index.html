@@ -66,7 +66,10 @@
     filter:blur(10px);pointer-events:none}
   .phone{position:relative;display:block;width:100%;height:auto;border-radius:34px 34px 8px 8px;
     border:1px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.6)}
-  canvas.phone{width:100%;aspect-ratio:480/827;height:auto;background:#050506;touch-action:pan-y;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .live{overflow:hidden;aspect-ratio:480/827;background:#050506;touch-action:pan-y;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .live video{position:absolute;left:-4%;top:-3%;width:108%;height:106%;object-fit:cover;opacity:0;transition:opacity .8s ease;will-change:transform}
+  .live video.on{opacity:1}
+  .live canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 
   /* screens */
   section{padding:56px 0;border-top:1px solid var(--line)}
@@ -149,8 +152,12 @@
         </div>
       </div>
       <div class="stage">
-        <canvas class="phone" id="live" width="480" height="827" role="img" data-i18n-aria="liveAlt"
-                aria-label="A live wallpaper under the lock-screen clock: rain falling through a street lamp's light over a sleeping city"></canvas>
+        <div class="phone live" id="live" role="img" data-i18n-aria="liveAlt"
+             aria-label="Drift's lock screen playing wallpapers from the library, one after another">
+          <video muted playsinline loop preload="none" aria-hidden="true"></video>
+          <video muted playsinline loop preload="none" aria-hidden="true"></video>
+          <canvas aria-hidden="true"></canvas>
+        </div>
       </div>
     </div>
 
@@ -242,7 +249,7 @@
       by: "by FOA Studios", eyebrow: "Live wallpapers for Android",
       lede: "<strong>A library of living wallpapers</strong> for your home and lock screen: short loops shared by people. Or make your own from the photos, GIFs and videos on your phone.",
       play: "Get it on Google Play", inside: "See what's inside",
-      liveAlt: "A live wallpaper under the lock-screen clock: rain falling through a street lamp's light over a sleeping city",
+      liveAlt: "Drift's lock screen playing wallpapers from the library, one after another",
       insideH: "Inside the app", insideSub: "Browse and preview the whole library for free, without an account.",
       c1: "Discover", d1: "Featured, New and Popular, with categories and search.",
       c2: "Up to 1080p", d2: "Set any wallpaper with Drift Pro, in 1080p where your phone supports it.",
@@ -281,7 +288,7 @@
       by: "FOA Studios'tan", eyebrow: "Android için canlı duvar kağıtları",
       lede: "Ana ekranın ve kilit ekranın için <strong>canlı duvar kağıtları kütüphanesi</strong>: insanların paylaştığı kısa döngüler. Ya da telefonundaki fotoğraf, GIF ve videolardan kendininkini yap.",
       play: "Google Play'den indir", inside: "İçinde neler var",
-      liveAlt: "Kilit ekranı saatinin altında canlı bir duvar kağıdı: uyuyan bir şehrin üstünde, sokak lambasının ışığında yağan yağmur",
+      liveAlt: "Drift'in kilit ekranında kütüphaneden duvar kağıtları art arda oynuyor",
       insideH: "Uygulamanın içi", insideSub: "Kütüphanenin tamamına hesapsız ve ücretsiz göz at, önizle.",
       c1: "Keşfet", d1: "Öne çıkanlar, Yeniler ve Popüler; kategoriler ve arama.",
       c2: "1080p'ye kadar", d2: "Drift Pro ile her duvar kağıdını, telefonun destekliyorsa 1080p kur.",
@@ -341,225 +348,132 @@
 })();
 </script>
 <script>
-// Hero: a small live wallpaper under the lock-screen clock. Rain falls through a sodium street lamp's light over a sleeping city.
-// It does what the app does (parallax when you move, swipe or tilt; rings where you tap) and keeps the app's battery manners:
-// capped at 30 FPS, stopped when it scrolls out of view or the tab is hidden, still under reduced motion unless you touch it.
+// Hero: Drift's lock screen playing real loops from the library (public teasers on the CDN), one after another like a playlist.
+// On top, what the app adds: parallax when you move, swipe or tilt, and rings where you tap. Battery manners as in the app:
+// nothing plays while the hero is off screen or the tab is hidden; under reduced motion it shows still posters and moves only when touched.
 (() => {
-  const cv = document.getElementById('live');
+  const CDN = 'https://cdn.foastudios.com/w/';
+  const WALLS = [
+    'a1984965-81da-42a1-bb5d-f196cae8d173',   // Atlas Rings
+    'b29101ce-e693-4e68-93e6-36d59b66d61e',   // Detective Goose
+    '77c784ed-de5e-462d-9578-4d6d4dd92269',   // Starry Clouds
+    '393832e5-e5a4-4287-8c6a-ac0524d62147',   // Duck Stare
+    'abe5d2a6-71f4-4e66-9862-b667bd7d500f',   // Starry Night
+    'ed1515f8-9daf-4b06-913e-dcb36cd05edd',   // Black Hole Flow
+    '0435f67a-433f-4733-a5da-304b2671771e',   // Golden Sprig
+  ];
+  const HOLD = 9000;
+  const box = document.getElementById('live');
+  const vids = [...box.querySelectorAll('video')];
+  const cv = box.querySelector('canvas');
   const ctx = cv.getContext('2d');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let W, H, d, GY, lamp, city, stars, drops, splashes = [], rings = [];
   const par = { x: 0, y: 0, tx: 0, ty: 0 };   // parallax now and target, -1..1
-  let userUntil = 0, activeUntil = 0, nextFlicker = 0;
-  let seed = 7;
-  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  let cur = 0, front = 0, userUntil = 0, rings = [], W = 0, H = 0, d = 1;
+  let visible = true, raf = 0, last = 0;
   const pad2 = n => String(n).padStart(2, '0');
+  const clamp = v => Math.max(-1, Math.min(1, v));
 
-  function newDrop(anywhere) {
-    return { x: -0.1 * W + Math.random() * 1.2 * W, y: anywhere ? Math.random() * GY : -Math.random() * H * 0.3,
-             v: H * (0.9 + Math.random() * 0.45), len: H * (0.018 + Math.random() * 0.02) };
+  function load(v, i) {
+    v.poster = CDN + WALLS[i] + '/poster_sm.webp';
+    if (!reduce) v.src = CDN + WALLS[i] + '/teaser.mp4';
+  }
+  function show(i) {
+    const back = vids[1 - front];
+    load(back, i);
+    const swap = () => {
+      back.classList.add('on'); vids[front].classList.remove('on');
+      const old = vids[front];
+      setTimeout(() => { if (!old.classList.contains('on')) old.pause(); }, 900);
+      front = 1 - front; cur = i;
+    };
+    if (reduce) { swap(); return; }
+    back.play().then(swap, swap);
   }
 
-  function setup() {
+  function size() {
     d = Math.min(2, window.devicePixelRatio || 1);
-    W = Math.max(1, Math.round(cv.clientWidth * d));
-    H = Math.max(1, Math.round(cv.clientHeight * d));
+    W = Math.max(1, Math.round(cv.clientWidth * d)); H = Math.max(1, Math.round(cv.clientHeight * d));
     cv.width = W; cv.height = H;
-    GY = H * 0.8;
-    lamp = { x: W * 0.72, top: H * 0.41, hx: W * 0.58, hy: H * 0.425 };
-    seed = 7;
-    city = [];
-    for (let x = -0.12 * W; x < 1.12 * W;) {
-      const w = W * (0.07 + rnd() * 0.1), h = H * (0.09 + rnd() * 0.2);
-      const cols = Math.max(1, Math.floor(w / (W * 0.032))), rows = Math.max(1, Math.floor(h / (H * 0.024)));
-      const wins = [];
-      for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
-        if (rnd() < 0.2) wins.push({ c, r, warm: rnd() < 0.75, on: true });
-      }
-      city.push({ x, w, h, cols, rows, wins, tone: rnd() < 0.5 ? '#0d0d10' : '#111115' });
-      x += w + W * 0.004;
-    }
-    stars = Array.from({ length: 46 }, () => ({ x: -0.1 * W + rnd() * 1.2 * W, y: rnd() * H * 0.55, s: rnd() < 0.2 ? 2 : 1, p: rnd() * 6.28 }));
-    drops = Array.from({ length: 150 }, () => newDrop(true));
   }
 
-  function cone() {
-    ctx.beginPath();
-    ctx.moveTo(lamp.hx - W * 0.025, lamp.hy + H * 0.008);
-    ctx.lineTo(lamp.hx + W * 0.025, lamp.hy + H * 0.008);
-    ctx.lineTo(lamp.hx + W * 0.24, GY);
-    ctx.lineTo(lamp.hx - W * 0.3, GY);
-    ctx.closePath();
-  }
-
-  function update(dt, now) {
-    const idle = now > userUntil;
-    if (idle) { par.tx = Math.sin(now / 4200) * 0.55; par.ty = Math.sin(now / 5300) * 0.3; }
-    const k = Math.min(1, dt * (idle ? 1.5 : 5));
-    par.x += (par.tx - par.x) * k; par.y += (par.ty - par.y) * k;
-    if (reduce) return;
-    for (const p of drops) {
-      p.y += p.v * dt; p.x += p.v * dt * 0.1;
-      if (p.y > GY) {
-        if (p.x > lamp.hx - W * 0.3 && p.x < lamp.hx + W * 0.24 && Math.random() < 0.5) splashes.push({ x: p.x, t: now });
-        Object.assign(p, newDrop(false));
-      }
-    }
-    splashes = splashes.filter(s => now - s.t < 260);
-    if (now > nextFlicker) {
-      const b = city[(Math.random() * city.length) | 0];
-      if (b.wins.length) { const w = b.wins[(Math.random() * b.wins.length) | 0]; w.on = !w.on; }
-      nextFlicker = now + 1200 + Math.random() * 2600;
-    }
-  }
-
-  function draw(now) {
-    const shift = depth => [par.x * depth * W * 0.05, par.y * depth * H * 0.012];
-    const sky = ctx.createLinearGradient(0, 0, 0, GY);
-    sky.addColorStop(0, '#050506'); sky.addColorStop(1, '#0c0b0e');
-    ctx.fillStyle = sky; ctx.fillRect(0, 0, W, H);
-
-    // stars, far away
-    let [sx, sy] = shift(0.15);
-    ctx.fillStyle = '#8a8982';
-    for (const s of stars) {
-      ctx.globalAlpha = reduce ? 0.45 : 0.3 + 0.3 * Math.sin(now / 1100 + s.p);
-      ctx.fillRect(Math.round(s.x + sx), Math.round(s.y + sy), s.s * d, s.s * d);
-    }
-    ctx.globalAlpha = 1;
-
-    // the city, mid distance
-    [sx, sy] = shift(0.45);
-    for (const b of city) {
-      const bx = b.x + sx, by = GY - b.h + sy;
-      ctx.fillStyle = b.tone; ctx.fillRect(bx, by, b.w, b.h + H);
-      const cw = b.w / b.cols, ch = b.h / b.rows;
-      for (const w of b.wins) {
-        if (!w.on) continue;
-        ctx.fillStyle = w.warm ? 'rgba(255,174,87,.55)' : 'rgba(170,190,230,.28)';
-        ctx.fillRect(bx + w.c * cw + cw * 0.3, by + w.r * ch + ch * 0.3, Math.max(d, cw * 0.4), Math.max(d, ch * 0.4));
-      }
-    }
-
-    // the street, the lamp and its rain, near
-    [sx, sy] = shift(1);
-    ctx.save(); ctx.translate(sx, sy);
-    ctx.fillStyle = '#070708'; ctx.fillRect(-W, GY, 3 * W, H);
-    const pool = ctx.createRadialGradient(lamp.hx, GY + (H - GY) * 0.3, 0, lamp.hx, GY + (H - GY) * 0.3, W * 0.4);
-    pool.addColorStop(0, 'rgba(255,174,87,.26)'); pool.addColorStop(1, 'rgba(255,174,87,0)');
-    ctx.fillStyle = pool; ctx.fillRect(-W, GY, 3 * W, H);
-    // the lamp's reflection on the wet street
-    const sh = reduce ? 1 : 0.85 + 0.15 * Math.sin(now / 180);
-    const refl = ctx.createLinearGradient(0, GY, 0, H);
-    refl.addColorStop(0, `rgba(255,189,115,${0.45 * sh})`); refl.addColorStop(1, 'rgba(255,189,115,0)');
-    ctx.fillStyle = refl; ctx.fillRect(lamp.hx - W * 0.012, GY, W * 0.024, H - GY);
-
-    cone();
-    const beam = ctx.createLinearGradient(0, lamp.hy, 0, GY);
-    beam.addColorStop(0, 'rgba(255,174,87,.24)'); beam.addColorStop(1, 'rgba(255,174,87,.05)');
-    ctx.fillStyle = beam; ctx.fill();
-
-    // rain: barely there in the dark, lit inside the beam
-    ctx.lineWidth = Math.max(1, d * 0.9);
-    ctx.strokeStyle = 'rgba(200,205,220,.07)';
-    ctx.beginPath();
-    for (const p of drops) { ctx.moveTo(p.x, p.y); ctx.lineTo(p.x - p.len * 0.1, p.y - p.len); }
-    ctx.stroke();
-    ctx.save(); cone(); ctx.clip();
-    ctx.strokeStyle = 'rgba(255,218,170,.6)';
-    ctx.beginPath();
-    for (const p of drops) { ctx.moveTo(p.x, p.y); ctx.lineTo(p.x - p.len * 0.1, p.y - p.len); }
-    ctx.stroke();
-    ctx.restore();
-    ctx.fillStyle = 'rgba(255,218,170,.7)';
-    for (const s of splashes) {
-      const a = (now - s.t) / 260, r = W * 0.008 * (0.5 + a);
-      ctx.globalAlpha = 1 - a;
-      ctx.fillRect(s.x - r, GY - r * 0.6, d, d); ctx.fillRect(s.x + r, GY - r * 0.6, d, d);
-    }
-    ctx.globalAlpha = 1;
-
-    // pole, arm, head and glow
-    ctx.fillStyle = '#16161a';
-    ctx.fillRect(lamp.x - W * 0.006, lamp.top, W * 0.012, GY - lamp.top);
-    ctx.fillRect(lamp.hx, lamp.top - W * 0.006, lamp.x - lamp.hx, W * 0.01);
-    ctx.fillRect(lamp.hx - W * 0.03, lamp.hy - H * 0.012, W * 0.06, H * 0.014);
-    const glow = ctx.createRadialGradient(lamp.hx, lamp.hy, 0, lamp.hx, lamp.hy, W * 0.2);
-    glow.addColorStop(0, 'rgba(255,190,120,.55)'); glow.addColorStop(0.25, 'rgba(255,174,87,.18)'); glow.addColorStop(1, 'rgba(255,174,87,0)');
-    ctx.fillStyle = glow; ctx.fillRect(lamp.hx - W * 0.2, lamp.hy - W * 0.2, W * 0.4, W * 0.4);
-    ctx.fillStyle = '#ffd9a8';
-    ctx.fillRect(lamp.hx - W * 0.022, lamp.hy, W * 0.044, H * 0.005);
-    ctx.restore();
-
-    // the lock-screen clock stays put, like the real one
+  // the lock-screen clock and the touch ripples, drawn over the video
+  function drawUI(now) {
+    ctx.clearRect(0, 0, W, H);
     const lang = document.documentElement.lang === 'tr' ? 'tr' : 'en';
     const t = new Date(), h = t.getHours();
     const time = (lang === 'tr' ? pad2(h) : String(h % 12 || 12)) + ':' + pad2(t.getMinutes());
-    ctx.fillStyle = '#ecebe6'; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    ctx.shadowColor = 'rgba(0,0,0,.45)'; ctx.shadowBlur = 18 * d;
+    ctx.fillStyle = '#ecebe6';
     ctx.font = `300 ${Math.round(W * 0.24)}px "Big Shoulders Display", "Arial Narrow", sans-serif`;
     ctx.fillText(time, W / 2, H * 0.2);
     ctx.font = `400 ${Math.round(W * 0.042)}px "Schibsted Grotesk", system-ui, sans-serif`;
-    ctx.fillStyle = 'rgba(236,235,230,.8)';
+    ctx.fillStyle = 'rgba(236,235,230,.85)';
     ctx.fillText(t.toLocaleDateString(lang, { weekday: 'short', day: 'numeric', month: 'short' }), W / 2, H * 0.245);
-
-    // touch ripples: two rings from where you tapped
+    ctx.shadowBlur = 0;
     ctx.lineWidth = 2 * d;
     for (const r of rings) {
       for (let i = 0; i < 2; i++) {
         const age = (now - r.t) / 1000 - i * 0.18;
         if (age <= 0 || age >= 1.1) continue;
         const e = 1 - Math.pow(1 - age / 1.1, 3);
-        ctx.strokeStyle = `rgba(255,189,115,${(1 - age / 1.1) * 0.8})`;
+        ctx.strokeStyle = `rgba(255,255,255,${(1 - age / 1.1) * 0.7})`;
         ctx.beginPath(); ctx.arc(r.x, r.y, W * 0.03 + e * W * 0.4, 0, Math.PI * 2); ctx.stroke();
       }
     }
     rings = rings.filter(r => now - r.t < 1300);
   }
 
-  // 30 FPS cap; nothing runs while the hero is off screen or the tab is hidden
-  let visible = true, raf = 0, last = 0, lastDraw = 0;
-  function frame(t) {
+  function frame(now) {
     raf = 0;
-    if (!visible || document.hidden || (reduce && t > activeUntil)) return;
+    if (!visible || document.hidden) return;
+    const busy = rings.length || now < userUntil + 1500 || Math.abs(par.tx - par.x) + Math.abs(par.ty - par.y) > 0.002;
+    if (reduce && !busy) { drawUI(now); return; }
     raf = requestAnimationFrame(frame);
-    if (t - lastDraw < 1000 / 30 - 2) return;
-    const dt = Math.min(0.1, (t - (last || t)) / 1000);
-    last = t; lastDraw = t;
-    update(dt, t); draw(t);
+    const dt = Math.min(0.1, (now - (last || now)) / 1000); last = now;
+    if (now > userUntil && !reduce) { par.tx = Math.sin(now / 4200) * 0.5; par.ty = Math.sin(now / 5300) * 0.3; }
+    const k = Math.min(1, dt * (now > userUntil ? 1.5 : 6));
+    par.x += (par.tx - par.x) * k; par.y += (par.ty - par.y) * k;
+    const tf = `translate3d(${(-par.x * 3).toFixed(2)}%, ${(-par.y * 1.5).toFixed(2)}%, 0)`;
+    for (const v of vids) v.style.transform = tf;
+    drawUI(now);
   }
   function start() {
-    if (raf || !visible || document.hidden || (reduce && performance.now() > activeUntil)) return;
+    if (raf || !visible || document.hidden) return;
+    if (!reduce) vids[front].play().catch(() => {});
     last = 0; raf = requestAnimationFrame(frame);
   }
-  function wake(ms) { userUntil = performance.now() + 2500; activeUntil = Math.max(activeUntil, performance.now() + ms); start(); }
-  const clamp = v => Math.max(-1, Math.min(1, v));
+  function stop() { for (const v of vids) v.pause(); }
 
-  setup(); draw(performance.now());
-  if (document.fonts) document.fonts.ready.then(() => draw(performance.now()));
-  new ResizeObserver(() => {
-    if (Math.round(cv.clientWidth * Math.min(2, window.devicePixelRatio || 1)) !== W) { setup(); draw(performance.now()); }
-  }).observe(cv);
-  new IntersectionObserver(e => { visible = e[0].isIntersecting; start(); }).observe(cv);
-  document.addEventListener('visibilitychange', start);
-  // the clock keeps time even when nothing else moves
-  setInterval(() => { if (!raf && visible && !document.hidden) draw(performance.now()); }, 15000);
+  size();
+  load(vids[0], 0); vids[0].classList.add('on');
+  drawUI(performance.now());
+  if (document.fonts) document.fonts.ready.then(() => drawUI(performance.now()));
+  new ResizeObserver(() => { size(); drawUI(performance.now()); }).observe(cv);
+  new IntersectionObserver(e => { visible = e[0].isIntersecting; visible ? start() : stop(); }).observe(box);
+  document.addEventListener('visibilitychange', () => { document.hidden ? stop() : start(); });
+  setInterval(() => { if (!raf && visible && !document.hidden) drawUI(performance.now()); }, 15000);
+  // the playlist: the next loop every few seconds, only while someone can see it
+  setInterval(() => { if (!reduce && visible && !document.hidden) show((cur + 1) % WALLS.length); }, HOLD);
 
-  cv.addEventListener('pointermove', e => {
-    const r = cv.getBoundingClientRect();
+  box.addEventListener('pointermove', e => {
+    const r = box.getBoundingClientRect();
     par.tx = clamp(((e.clientX - r.left) / r.width - 0.5) * 2);
     par.ty = clamp(((e.clientY - r.top) / r.height - 0.5) * 2);
-    wake(2500);
+    userUntil = performance.now() + 2500; start();
   });
-  cv.addEventListener('pointerdown', e => {
-    const r = cv.getBoundingClientRect();
+  box.addEventListener('pointerdown', e => {
+    const r = box.getBoundingClientRect();
     rings.push({ x: (e.clientX - r.left) * (W / r.width), y: (e.clientY - r.top) * (H / r.height), t: performance.now() });
-    wake(1400);
+    // under reduced motion the loop plays only when asked for
+    if (reduce && !vids[front].src) { vids[front].src = CDN + WALLS[cur] + '/teaser.mp4'; vids[front].play().catch(() => {}); }
+    start();
   });
   window.addEventListener('deviceorientation', e => {
     if (e.gamma == null || !visible) return;
     par.tx = clamp(e.gamma / 25); par.ty = clamp(((e.beta || 45) - 45) / 30);
-    userUntil = performance.now() + 2500;
-    if (!reduce) start();
+    userUntil = performance.now() + 2500; start();
   });
   start();
 })();
