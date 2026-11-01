@@ -183,8 +183,9 @@
       <li><b>What you add:</b> the wallpapers you upload with their title, tags and source note, your likes, the people you block, your appeals, and the reports you send (a report with no account is stored without any account link).</li>
       <li><b>Pro check:</b> the Google Play purchase token is sent to Google Play to confirm Pro, and a one-way digest of the purchase token, the product and the Pro end date are stored with your account so one purchase counts for one account; they are deleted with the account.</li>
       <li><b>Copyright notices</b> sent by rights holders: the name, e-mail address and reasoning they give us.</li>
+      <li><b>Notifications (only if you turn them on):</b> a notification token from Firebase Cloud Messaging, linked to your account, so we can tell you when your upload is approved or rejected (and moderators when an upload is waiting for review). It is removed when you sign out or delete the account, and dropped when it stops working (for example after you uninstall Drift).</li>
     </ul>
-    <p>We use this to run the library, review uploads, handle reports and notices, and confirm Pro. We do not sell data or run analytics, tracking or crash-reporting SDKs. Drift itself does not read or store a device ID or an advertising ID. The one exception is the optional ad described under <a href="#ads">Ads</a> below, which is handled by Google AdMob.</p>
+    <p>We use this to run the library, review uploads, handle reports and notices, and confirm Pro. We do not sell data or run analytics, tracking or crash-reporting SDKs. Drift itself does not read a device ID or an advertising ID; the only device-linked value it stores is the notification token above, if you turn notifications on. The optional ad described under <a href="#ads">Ads</a> below is handled by Google AdMob.</p>
   </section>
 
   <hr class="rule">
@@ -213,6 +214,7 @@
       <tr><td>Moderation log (decisions, strikes), copyright notices</td><td>1 year</td></tr>
       <tr><td>Strikes, bans and the used free first upload of a deleted account, stored as a one-way fingerprint of the Google account</td><td>1 year</td></tr>
       <tr><td>Resolved reports (upheld or dismissed)</td><td>deleted 1 year after they are handled. Open reports are kept until a moderator handles them.</td></tr>
+      <tr><td>Notification token</td><td>until you sign out, delete the account, or it stops working</td></tr>
       <tr><td>Account, profile, likes, blocks, appeals, the ad reward confirmations (transaction ID and time) and the Pro purchase link (token digest, product, end date)</td><td>until you delete the account</td></tr>
     </table></div>
   </section>
@@ -227,8 +229,9 @@
       <li><b>Google Cloud</b> (EU region): the worker that converts uploads, and <b>Cloud Vision</b>, which scans frames for unsafe content.</li>
       <li><b>Google AdMob</b> (Google LLC): the optional ad that earns an upload, and the signed reward confirmation.</li>
       <li><b>Google Play:</b> purchases, and its billing component's own diagnostics under <a href="https://policies.google.com/privacy">Google's privacy policy</a>.</li>
+      <li><b>Firebase Cloud Messaging</b> (Google LLC): delivers notifications, if you turn them on. It receives the notification token and the notification text.</li>
     </ul>
-    <p>Some of these providers (Google Play, Google AdMob, Cloudflare) may process data outside the EU under their standard safeguards. Public wallpapers and the username of the uploader are visible to everyone.</p>
+    <p>Some of these providers (Google Play, Google AdMob, Firebase Cloud Messaging, Cloudflare) may process data outside the EU under their standard safeguards. Public wallpapers and the username of the uploader are visible to everyone.</p>
     <p><b>Data controller: FOA Studios, main@foastudios.com</b></p>
   </section>
 
@@ -262,13 +265,14 @@
     <p><b>IP adresi:</b> kötüye kullanımı sınırlamak için günlük şikâyet ve telif bildirimi sayısı sayılır. Ham IP adresini veritabanımızda saklamayız; yalnız kötüye kullanım sınırı için günlük tek yönlü bir özet tutulur ve <b>7 gün</b> sonra silinir. Barındırma sağlayıcılarımız (Supabase, Cloudflare) kısa süre standart istek günlüklerini tutabilir.</p>
     <p><b>Saklama:</b> onaylanan yüklemenin ham dosyası onaydan 7 gün sonra silinir; reddedilen/kaldırılan içeriğin dosyaları itiraz için 90 gün arşivde tutulur, dosyaları 90 gün sonra silinir; aynı dosya yeniden yüklenemesin diye kaydın başlığı, etiketleri ve içerik parmak izi kalır (hesap silinince kaydın yükleyene bağlantısı kaldırılır); moderasyon kaydı ve telif bildirimleri <b>1 yıl</b> tutulur; sonuçlanmış şikâyetler işlendikten 1 yıl sonra silinir, açık olanlar bir moderatör işleyene dek kalır; hesabınızı silerseniz profil, beğeni, engelleme ve itirazlarınız, reklam ödülü onaylarınız ve Pro satın alma bağlantınız silinir.</p>
     <p><b>Silinmiş hesapta kalan:</b> uyarısı ya da yasağı olan ya da ilk ücretsiz yüklemesini kullanmış bir hesap silinirse, kapatılan hesap geri dönemesin ve ilk ücretsiz yükleme yeniden verilmesin diye Google hesabının tek yönlü parmak izi ve uyarı sayısı <b>1 yıl</b> tutulur. Bu izden e-postanız ya da adınız geri çıkarılamaz.</p>
-    <p><b>Hizmet sağlayıcılar:</b> Supabase (AB), Cloudflare (R2, kuyruklar), Google Cloud (AB; yükleme işleme ve Cloud Vision ile güvenlik taraması), Google Play (satın alma), Google AdMob (isteğe bağlı ödüllü reklam).</p>
-    <p><b>Veri sorumlusu:</b> FOA Studios, main@foastudios.com. Bazı sağlayıcılar (Google Play, Google AdMob, Cloudflare) verileri standart güvenceleriyle AB dışında işleyebilir.</p>
+    <p><b>Hizmet sağlayıcılar:</b> Supabase (AB), Cloudflare (R2, kuyruklar), Google Cloud (AB; yükleme işleme ve Cloud Vision ile güvenlik taraması), Google Play (satın alma), Google AdMob (isteğe bağlı ödüllü reklam), Firebase Cloud Messaging (Google; bildirimler).</p>
+    <p><b>Bildirimler (yalnız açarsanız):</b> yüklemeniz onaylanınca ya da reddedilince haber verebilmek için hesabınıza bağlı bir bildirim belirteci (Firebase Cloud Messaging) saklanır. Çıkış yapınca ya da hesabı silince kaldırılır; çalışmaz hâle gelince (örneğin Drift'i kaldırınca) silinir.</p>
+    <p><b>Veri sorumlusu:</b> FOA Studios, main@foastudios.com. Bazı sağlayıcılar (Google Play, Google AdMob, Firebase Cloud Messaging, Cloudflare) verileri standart güvenceleriyle AB dışında işleyebilir.</p>
     <p><b>Haklarınız:</b> KVKK ve GDPR kapsamında erişim, düzeltme, silme, itiraz ve şikâyet haklarınız vardır. Uygulamada <b>Upload &rarr; Account &rarr; Delete account</b> ile hesabınızı silebilir ya da <a href="mailto:main@foastudios.com">main@foastudios.com</a> adresine yazabilirsiniz. Hesap ve yükleme için en düşük yaş 13'tür.</p>
   </section>
 
   <footer>
-    <span class="mono">Last updated 26 October 2026</span>
+    <span class="mono">Last updated 2 November 2026</span>
     <span>© 2026 <a href="https://foastudios.com/">FOA Studios</a> · Drift Live Wallpapers</span>
   </footer>
 </main>
