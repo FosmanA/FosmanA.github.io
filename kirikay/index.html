@@ -8,11 +8,17 @@
   <meta name="description" content="Kırıkay is a pixel brick breaker about turning one ball into a swarm. Bosses guard the gates and every level is built by hand.">
   <meta property="og:title" content="Kırıkay: Brick Breaker">
   <meta property="og:description" content="A pixel brick breaker about turning one ball into a swarm.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://foastudios.com/kirikay/">
+  <meta property="og:image" content="https://foastudios.com/kirikay/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
   <meta name="theme-color" content="#1E1C3F">
   <link rel="icon" href="icon.png" type="image/png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Old+Turkic&family=Pixelify+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@700&family=Noto+Sans+Old+Turkic&family=Pixelify+Sans:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --night: #1E1C3F;
@@ -40,7 +46,7 @@
     .studio { display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 52px; padding: 0 16px;
       background: #0a0a0c; border-bottom: 1px solid rgba(255,255,255,.08); font: 600 15px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
     .studio a { color: #e8e6e1; text-decoration: none; }
-    .studio-home { white-space: nowrap; letter-spacing: .02em; }
+    .studio-home { white-space: nowrap; font: 700 18px/1 "Chakra Petch", system-ui, sans-serif; letter-spacing: 0; }
     .studio-tabs { display: flex; gap: 4px; align-self: stretch; }
     .studio-tabs a { display: flex; align-items: center; gap: 8px; padding: 0 12px; color: #a7a5a0; border-bottom: 2px solid transparent; }
     .studio-tabs a:hover { color: #fff; }
@@ -59,9 +65,8 @@
     }
     .lang:hover { background: var(--gold); color: var(--deep); }
 
-    main {
-      flex: 1;
-      width: 100%;
+    main { flex: 1; width: 100%; }
+    .hero {
       max-width: 1120px;
       margin: 0 auto;
       padding: 16px 24px 64px;
@@ -97,13 +102,34 @@
       text-decoration-thickness: 2px;
       text-underline-offset: 4px;
     }
-    .links { margin: 16px 0 0; display: flex; flex-wrap: wrap; gap: 8px 28px; }
+    .links { margin: 28px 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 16px 28px; }
     .links a {
       color: var(--gold);
       text-decoration: underline;
       text-decoration-thickness: 2px;
       text-underline-offset: 4px;
     }
+    .links .contact { margin: 0; }
+    /* the one solid thing on the page: a gold brick you press */
+    .links a.btn {
+      display: inline-flex; align-items: center; min-height: 52px; padding: 10px 22px;
+      font-weight: 700; font-size: 1.125rem; line-height: 1.2;
+      color: var(--deep); background: var(--gold); text-decoration: none;
+      box-shadow: inset 0 4px 0 #FFE39A, inset 0 -4px 0 var(--gold-shade), 6px 6px 0 rgba(10, 9, 28, .55);
+    }
+    .links a.btn:hover { background: #FFD257; }
+    .links a.btn:active { transform: translate(3px, 3px); box-shadow: inset 0 4px 0 #FFE39A, inset 0 -4px 0 var(--gold-shade), 3px 3px 0 rgba(10, 9, 28, .55); }
+
+    /* what the wall does: four real playfields from the game */
+    .inside { max-width: 1120px; margin: 0 auto; padding: 24px 24px 72px; }
+    .inside h2, .end h2 { margin: 0; font-weight: 700; font-size: clamp(1.75rem, 4vw, 2.5rem); line-height: 1.1; color: var(--gold); text-shadow: .06em .06em 0 var(--gold-shade); }
+    .shots { list-style: none; margin: 32px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; }
+    .shots img { display: block; width: 100%; height: auto; border: 4px solid var(--gold); box-shadow: 8px 8px 0 rgba(10, 9, 28, .55); }
+    .shots h3 { margin: 22px 0 0; font-weight: 700; font-size: 1.25rem; line-height: 1.2; color: var(--gold); }
+    .shots p { margin: 6px 0 0; font-size: 1rem; line-height: 1.45; color: var(--moon); }
+
+    .end { max-width: 1120px; margin: 0 auto; padding: 0 24px 80px; }
+    .end > p:not(.links) { margin: 14px 0 0; max-width: 40ch; color: var(--moon); }
 
     .frame {
       aspect-ratio: 1;
@@ -117,9 +143,13 @@
 
     .kilim { height: 44px; background-repeat: repeat-x; background-position: center bottom; image-rendering: pixelated; }
 
+    @media (max-width: 900px) {
+      .shots { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 16px; }
+    }
     @media (max-width: 760px) {
-      main { grid-template-columns: minmax(0, 1fr); gap: 40px; padding-top: 8px; }
+      .hero { grid-template-columns: minmax(0, 1fr); gap: 40px; padding-top: 8px; }
       .frame { width: 100%; max-width: 440px; }
+      .shots img { box-shadow: 5px 5px 0 rgba(10, 9, 28, .55); }
     }
   </style>
 </head>
@@ -136,19 +166,56 @@
   </div>
 
   <main>
+   <div class="hero">
     <section>
       <h1>Kırıkay</h1>
       <p class="runes" aria-hidden="true" data-i18n-title="runeTitle" title="“Türük” in Old Turkic (Orkhon) script"><span lang="otk">𐱅𐰇𐰼𐰜</span></p>
       <p class="lede" data-i18n="lede">A pixel brick breaker about one thing: turning a single ball into a swarm and tearing the wall apart. Bosses guard the gates, every level is built by hand. No energy bar, no shop.</p>
-      <p class="contact"><span data-i18n="write">Write to us:</span> <a href="mailto:main@foastudios.com">main@foastudios.com</a></p>
       <p class="links">
-        <a href="https://play.google.com/store/apps/details?id=com.osmanalkan.kirikay" data-i18n="play">Kırıkay on Google Play</a>
-        <a href="../kirikay-gizlilik/" data-i18n="privacy">Kırıkay privacy policy</a>
+        <a class="btn" href="https://play.google.com/store/apps/details?id=com.osmanalkan.kirikay" data-i18n="play">Kırıkay on Google Play</a>
+        <a href="#inside" data-i18n="see">See the wall</a>
       </p>
     </section>
     <div class="frame">
       <canvas id="field" role="img" data-i18n-aria="field" aria-label="A ball breaking a wall of kilim-patterned bricks"></canvas>
     </div>
+   </div>
+
+    <section class="inside" id="inside">
+      <h2 data-i18n="insideH">What's in the wall</h2>
+      <ul class="shots">
+        <li>
+          <img src="swarm-full.webp" width="480" height="831" loading="lazy" alt="" data-i18n-alt="aSwarm">
+          <h3 data-i18n="hSwarm">Ball swarms</h3>
+          <p data-i18n="pSwarm">Hit a splitter and one ball becomes three. Keep catching and the swarm keeps growing.</p>
+        </li>
+        <li>
+          <img src="boss.webp" width="480" height="831" loading="lazy" alt="" data-i18n-alt="aBoss">
+          <h3 data-i18n="hBoss">Bosses</h3>
+          <p data-i18n="pBoss">Each has its own face, its own attacks, and a second phase when it is hurt.</p>
+        </li>
+        <li>
+          <img src="blast.webp" width="480" height="831" loading="lazy" alt="" data-i18n-alt="aBlast">
+          <h3 data-i18n="hBlast">Exploding bricks</h3>
+          <p data-i18n="pBlast">One hit blasts a hole in the wall around them.</p>
+        </li>
+        <li>
+          <img src="keys.webp" width="480" height="831" loading="lazy" alt="" data-i18n-alt="aKeys">
+          <h3 data-i18n="hKeys">Keys and locks</h3>
+          <p data-i18n="pKeys">Break every key and the lock wall opens.</p>
+        </li>
+      </ul>
+    </section>
+
+    <section class="end">
+      <h2 data-i18n="endH">One thumb. Plays offline.</h2>
+      <p data-i18n="endP">No energy bar, no loot boxes, no shop. Tap, release the ball, keep it alive.</p>
+      <p class="links">
+        <a class="btn" href="https://play.google.com/store/apps/details?id=com.osmanalkan.kirikay" data-i18n="play">Kırıkay on Google Play</a>
+        <a href="../kirikay-gizlilik/" data-i18n="privacy">Kırıkay privacy policy</a>
+        <span class="contact"><span data-i18n="write">Write to us:</span> <a href="mailto:main@foastudios.com">main@foastudios.com</a></span>
+      </p>
+    </section>
   </main>
 
   <footer class="kilim" aria-hidden="true"></footer>
@@ -160,6 +227,18 @@
       en: {
         lede: "A pixel brick breaker about one thing: turning a single ball into a swarm and tearing the wall apart. Bosses guard the gates, every level is built by hand. No energy bar, no shop.",
         write: "Write to us:",
+        see: "See the wall",
+        insideH: "What's in the wall",
+        hSwarm: "Ball swarms", pSwarm: "Hit a splitter and one ball becomes three. Keep catching and the swarm keeps growing.",
+        hBoss: "Bosses", pBoss: "Each has its own face, its own attacks, and a second phase when it is hurt.",
+        hBlast: "Exploding bricks", pBlast: "One hit blasts a hole in the wall around them.",
+        hKeys: "Keys and locks", pKeys: "Break every key and the lock wall opens.",
+        aSwarm: "A swarm of white balls carving through a wall of gold bricks",
+        aBoss: "A purple boss with a face, ringed by locked bricks",
+        aBlast: "A red and pink wall with a hole blown into it",
+        aKeys: "A gold wall with key bricks and a row of locks along the bottom",
+        endH: "One thumb. Plays offline.",
+        endP: "No energy bar, no loot boxes, no shop. Tap, release the ball, keep it alive.",
         play: "Kırıkay on Google Play",
         privacy: "Kırıkay privacy policy",
         runeTitle: "“Türük” in Old Turkic (Orkhon) script",
@@ -170,6 +249,18 @@
       tr: {
         lede: "Tek bir şey üzerine bir piksel tuğla kırma oyunu: bir topu sürüye çevirip duvarı parçalamak. Kapılarda boss'lar bekliyor, her seviye elle kurulmuş. Enerji çubuğu yok, mağaza yok.",
         write: "Bize yazın:",
+        see: "Duvara bak",
+        insideH: "Duvarda ne var",
+        hSwarm: "Top sürüleri", pSwarm: "Bölücüye vur, bir top üç olsun. Düşenleri yakaladıkça sürü büyür.",
+        hBoss: "Boss'lar", pBoss: "Her birinin kendi yüzü, kendi saldırıları ve yaralanınca açılan ikinci evresi var.",
+        hBlast: "Patlayan tuğlalar", pBlast: "Tek vuruşta çevresindeki duvarda delik açar.",
+        hKeys: "Anahtarlar ve kilitler", pKeys: "Bütün anahtarları kır, kilit duvarı açılsın.",
+        aSwarm: "Altın tuğlalardan bir duvarı oyan beyaz top sürüsü",
+        aBoss: "Kilitli tuğlalarla çevrili, yüzü olan mor bir boss",
+        aBlast: "İçine delik açılmış kırmızı ve pembe bir duvar",
+        aKeys: "Anahtar tuğlaları ve altta bir sıra kilidi olan altın bir duvar",
+        endH: "Tek başparmak. İnternetsiz oynanır.",
+        endP: "Enerji çubuğu yok, ganimet kutusu yok, mağaza yok. Dokun, topu bırak, düşürme.",
         play: "Kırıkay Google Play'de",
         privacy: "Kırıkay gizlilik politikası",
         runeTitle: "Orhun yazısıyla “Türük”",
@@ -188,6 +279,7 @@
       const t = T[l];
       document.documentElement.lang = l;
       document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t[el.dataset.i18n]; });
+      document.querySelectorAll('[data-i18n-alt]').forEach(el => { el.alt = t[el.dataset.i18nAlt]; });
       document.querySelectorAll('[data-i18n-title]').forEach(el => { el.title = t[el.dataset.i18nTitle]; });
       document.querySelectorAll('[data-i18n-aria]').forEach(el => { el.setAttribute('aria-label', t[el.dataset.i18nAria]); });
       document.querySelector('meta[name="description"]').content = t.desc;

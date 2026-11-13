@@ -7,12 +7,18 @@
   <meta name="description" content="FOA Studios is a small independent studio in Türkiye making games and apps for Android: Kırıkay and Drift.">
   <meta property="og:title" content="FOA Studios">
   <meta property="og:description" content="A small independent studio in Türkiye making games and apps for Android.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://foastudios.com/">
+  <meta property="og:image" content="https://foastudios.com/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
   <meta name="theme-color" content="#0a0a0c">
   <link rel="canonical" href="https://foastudios.com/">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800&family=Pixelify+Sans:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800&family=Chakra+Petch:wght@700&family=Pixelify+Sans:wght@700&display=swap" rel="stylesheet">
   <!-- Stüdyo ana sayfası: nötr gece zemini, her uygulama kendi kartında kendi dünyasıyla (Kırıkay: kilim gecesi, altın, piksel;
        Drift: OLED siyahı, sodyum lamba, Big Shoulders). Üstteki şerit /kirikay/ ve /drift/ sayfalarında da aynı.
        Sayı yazılmaz (seviye/boss/duvar kâğıdı sayıları uygulamalarla değişir). EN/TR localStorage 'lang', diğer sayfalarla ortak. -->
@@ -37,11 +43,19 @@
     }
     :focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
 
+    /* behind everything: Anatolian kilim motifs (eli belinde, koç boynuzu, bereket, yıldız, göz ...) as woven silhouettes, one tone, dark on dark */
+    body { position: relative; }
+    body::before { content: ""; position: absolute; inset: 52px 0 0; z-index: 0; pointer-events: none;
+      background: url(pattern.svg) center top / 256px 192px; image-rendering: pixelated;
+      -webkit-mask-image: linear-gradient(#000, rgba(0,0,0,.6) 640px, rgba(0,0,0,.3));
+      mask-image: linear-gradient(#000, rgba(0,0,0,.6) 640px, rgba(0,0,0,.3)); }
+    main, footer { position: relative; z-index: 1; }
+
     /* studio strip: the same two app tabs on every FOA Studios page */
     .studio { display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 52px; padding: 0 16px;
       background: #0a0a0c; border-bottom: 1px solid rgba(255,255,255,.08); font: 600 15px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
     .studio a { color: #e8e6e1; text-decoration: none; }
-    .studio-home { white-space: nowrap; letter-spacing: .02em; }
+    .studio-home { white-space: nowrap; font: 700 18px/1 "Chakra Petch", system-ui, sans-serif; letter-spacing: 0; }
     .studio-tabs { display: flex; gap: 4px; align-self: stretch; }
     .studio-tabs a { display: flex; align-items: center; gap: 8px; padding: 0 12px; color: #a7a5a0; border-bottom: 2px solid transparent; }
     .studio-tabs a:hover { color: #fff; }
@@ -53,7 +67,7 @@
     main { flex: 1; width: 100%; max-width: 1080px; margin: 0 auto; padding: 48px 16px 64px; }
     @media (min-width: 640px) { main { padding: 72px 32px 88px; } }
     .head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
-    h1 { margin: 0; font-size: clamp(2.5rem, 7vw, 4.25rem); line-height: 1; font-weight: 800; letter-spacing: -.02em; }
+    h1 { margin: 0; font: 700 clamp(2.75rem, 8vw, 5rem)/.95 "Chakra Petch", system-ui, sans-serif; letter-spacing: -.01em; }
     .lede { margin: 18px 0 0; max-width: 36ch; font-size: clamp(1.05rem, 2vw, 1.25rem); color: var(--ink-2); }
     .lang {
       flex: none;
@@ -77,16 +91,19 @@
     .app h2 a::after { content: ""; position: absolute; inset: 0; z-index: 1; }   /* the whole card opens the app's page */
     .kind { margin: 0 0 12px; font-size: .8125rem; letter-spacing: .12em; text-transform: uppercase; }
     .app p.what { margin: 14px 0 0; max-width: 34ch; }
-    .app .row { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 18px; font-weight: 600; }
+    .app .row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin: 22px 0 0; font-weight: 600; }
     .app .row a { position: relative; z-index: 2; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
-    .shot { margin-top: auto; display: block; width: 100%; height: 280px; object-fit: cover; object-position: top; }
-    @media (min-width: 760px) { .shot { height: 340px; } }
+    .app .row a.btn { display: inline-flex; align-items: center; min-height: 48px; padding: 10px 20px; text-decoration: none; line-height: 1.2; }
+    .shot { margin-top: auto; display: block; width: 100%; height: auto; }
 
     /* Kırıkay: kilim night, gold, pixels */
     .kirikay { background: #1E1C3F url(stars.svg) repeat; border: 4px solid #F4C23A; color: #DCD8F4; box-shadow: 8px 8px 0 rgba(10,9,28,.6); }
     .kirikay h2 { font: 700 clamp(2.5rem, 6vw, 3.25rem)/1 "Pixelify Sans", system-ui, sans-serif; color: #F4C23A; text-shadow: .06em .06em 0 #9C6B10; }
     .kirikay .kind { color: #9A96C4; }
     .kirikay .row a { color: #F4C23A; }
+    .kirikay .row a.btn { font: 700 1.0625rem/1.2 "Pixelify Sans", system-ui, sans-serif; color: #15142E; background: #F4C23A;
+      box-shadow: inset 0 3px 0 #FFE39A, inset 0 -3px 0 #9C6B10, 5px 5px 0 rgba(10,9,28,.55); }
+    .kirikay .row a.btn:hover { background: #FFD257; }
     .kirikay .shot { image-rendering: auto; border-top: 4px solid #F4C23A; }
 
     /* Drift: OLED black under a sodium lamp */
@@ -96,7 +113,22 @@
     .drift h2 { font: 800 clamp(3rem, 7vw, 4rem)/.85 "Big Shoulders Display", "Arial Narrow", sans-serif; text-transform: uppercase; color: #ecebe6; }
     .drift .kind { color: #8a8982; }
     .drift .row a { color: #ffbd73; }
-    .drift .shot { position: relative; width: calc(100% - 48px); margin: auto 24px 0; border-radius: 20px 20px 0 0; border: 1px solid rgba(236,235,230,.14); border-bottom: 0; }
+    .drift .row a.btn { color: #1a1206; background: #ffae57; border-radius: 14px; }
+    .drift .row a.btn:hover { filter: brightness(1.08); }
+    /* the phone rises out of the card's lower edge; the card clips it, the clock stays in view */
+    .drift .shot { position: relative; width: calc(100% - 96px); max-width: 340px; margin: 12px auto -22%; border-radius: 28px; border: 1px solid rgba(236,235,230,.2); box-shadow: 0 0 0 6px #0c0c0e; }
+
+    /* where else the studio is */
+    .else { margin-top: 56px; padding-top: 28px; border-top: 1px solid var(--line); display: grid; gap: 20px; }
+    @media (min-width: 760px) { .else { grid-template-columns: 1fr 2fr; gap: 24px; margin-top: 72px; } }
+    .else h2 { margin: 0; font-size: .8125rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); }
+    .else ul { list-style: none; margin: 0; padding: 0; }
+    .else li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 16px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+    .else li:first-child { padding-top: 0; }
+    .else a { color: var(--ink); font-weight: 600; text-decoration: underline; text-decoration-color: rgba(255,255,255,.3); text-decoration-thickness: 2px; text-underline-offset: 4px; }
+    .else a:hover { text-decoration-color: var(--ink); }
+    .else .where { flex: none; width: 6.5em; color: var(--ink-2); font-size: .9375rem; }
+    .else .note { color: var(--ink-2); font-size: .9375rem; }
 
     footer { border-top: 1px solid var(--line); }
     .foot { max-width: 1080px; margin: 0 auto; padding: 24px 16px 32px; display: flex; flex-wrap: wrap; gap: 8px 24px; color: var(--ink-2); font-size: .9375rem; }
@@ -130,11 +162,11 @@
           <h2><a href="/kirikay/">Kırıkay</a></h2>
           <p class="what" data-i18n="kWhat">Turn a single ball into a swarm and tear the wall apart. Bosses guard the gates, every level is built by hand.</p>
           <p class="row">
-            <a href="https://play.google.com/store/apps/details?id=com.osmanalkan.kirikay" data-i18n="onPlay">Google Play</a>
+            <a class="btn" href="https://play.google.com/store/apps/details?id=com.osmanalkan.kirikay" data-i18n="onPlay">Get it on Google Play</a>
             <a href="/kirikay-gizlilik/" data-i18n="privacy">Privacy</a>
           </p>
         </div>
-        <img class="shot" src="kirikay/swarm.webp" width="480" height="600" loading="lazy" alt="" data-i18n-alt="kAlt">
+        <img class="shot" src="kirikay/swarm.webp" width="480" height="600" alt="" data-i18n-alt="kAlt">
       </article>
 
       <article class="app drift">
@@ -143,13 +175,21 @@
           <h2><a href="/drift/">Drift</a></h2>
           <p class="what" data-i18n="dWhat">Living wallpapers for your home and lock screen: short loops shared by people, or made from your own videos.</p>
           <p class="row">
-            <a href="https://play.google.com/store/apps/details?id=com.foalkan.drift" data-i18n="onPlay">Google Play</a>
+            <a class="btn" href="https://play.google.com/store/apps/details?id=com.foalkan.drift" data-i18n="onPlay">Get it on Google Play</a>
             <a href="/drift-gizlilik/" data-i18n="privacy">Privacy</a>
           </p>
         </div>
-        <img class="shot" src="drift/card.webp" width="480" height="600" loading="lazy" alt="" data-i18n-alt="dAlt">
+        <img class="shot" src="drift/card.webp" width="480" height="600" alt="" data-i18n-alt="dAlt">
       </article>
     </div>
+
+    <section class="else" aria-labelledby="else-h">
+      <h2 id="else-h" data-i18n="elseH">Elsewhere</h2>
+      <ul>
+        <li><span class="where">Instagram</span><a href="https://www.instagram.com/kirikay.app/">@kirikay.app</a><span class="note" data-i18n="igKirikay">Kırıkay.</span></li>
+        <li><span class="where">Instagram</span><a href="https://www.instagram.com/drift.livewallpaper/">@drift.livewallpaper</a><span class="note" data-i18n="igDrift">Drift, and new wallpapers from the library.</span></li>
+      </ul>
+    </section>
   </main>
 
   <footer>
@@ -164,13 +204,16 @@
     const T = {
       en: {
         lede: "A small independent studio in Türkiye. We make games and apps for Android.",
+        elseH: "Elsewhere",
+        igKirikay: "Kırıkay.",
+        igDrift: "Drift, and new wallpapers from the library.",
         kKind: "Game · Brick breaker",
         kWhat: "Turn a single ball into a swarm and tear the wall apart. Bosses guard the gates, every level is built by hand.",
         kAlt: "Kırıkay: a swarm of white balls tearing through a wall of gold bricks",
         dKind: "App · Live wallpapers",
         dWhat: "Living wallpapers for your home and lock screen: short loops shared by people, or made from your own videos.",
         dAlt: "Drift: a moonlit sky playing under the lock-screen clock",
-        onPlay: "Google Play",
+        onPlay: "Get it on Google Play",
         privacy: "Privacy",
         write: "Write to us:",
         desc: "FOA Studios is a small independent studio in Türkiye making games and apps for Android: Kırıkay and Drift.",
@@ -178,13 +221,16 @@
       },
       tr: {
         lede: "Türkiye'de küçük, bağımsız bir stüdyo. Android için oyunlar ve uygulamalar yapıyoruz.",
+        elseH: "Başka yerlerde",
+        igKirikay: "Kırıkay.",
+        igDrift: "Drift ve kütüphaneden yeni duvar kağıtları.",
         kKind: "Oyun · Tuğla kırma",
         kWhat: "Tek bir topu sürüye çevir, duvarı parçala. Kapılarda boss'lar bekliyor, her seviye elle kurulmuş.",
         kAlt: "Kırıkay: altın tuğlalardan bir duvarı delip geçen beyaz top sürüsü",
         dKind: "Uygulama · Canlı duvar kağıtları",
         dWhat: "Ana ve kilit ekranın için canlı duvar kağıtları: insanların paylaştığı kısa döngüler ya da kendi videoların.",
         dAlt: "Drift: kilit ekranı saatinin altında oynayan ay ışıklı bir gökyüzü",
-        onPlay: "Google Play",
+        onPlay: "Google Play'den indir",
         privacy: "Gizlilik",
         write: "Bize yazın:",
         desc: "FOA Studios, Türkiye'de Android için oyunlar ve uygulamalar yapan küçük, bağımsız bir stüdyo: Kırıkay ve Drift.",
