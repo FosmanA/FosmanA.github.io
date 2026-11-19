@@ -165,7 +165,7 @@
 
   <p class="eyebrow">Privacy Policy</p>
   <h1>What Drift keeps, and for how long.</h1>
-  <p class="lead"><b>You can use Drift without an account, and then it keeps no profile of you.</b> An account is only for uploading, liking, blocking and appealing in the community library. This page says what that account stores and who helps us run it.</p>
+  <p class="lead"><b>You can use Drift without an account, and then we keep no profile of you</b> (only the few anonymous ad-measurement events described under <a href="#measuring">Measuring our ads</a>). An account is only for uploading, liking, blocking and appealing in the community library. This page says what that account stores and who helps us run it.</p>
   <nav class="nav" aria-label="Drift pages"><a href="../drift-gizlilik/" aria-current="page">Privacy policy</a><a href="../drift-kurallar/">Community rules</a><a href="../drift-telif/">Copyright notice</a><a href="../drift-hesap-silme/">Delete account</a></nav>
 
   <hr class="rule">
@@ -185,7 +185,7 @@
       <li><b>Copyright notices</b> sent by rights holders: the name, e-mail address and reasoning they give us.</li>
       <li><b>Notifications (only if you turn them on):</b> a notification token from Firebase Cloud Messaging, linked to your account, so we can tell you when your upload is approved or rejected (and moderators when an upload is waiting for review). It is removed when you sign out or delete the account, and dropped when it stops working (for example after you uninstall Drift).</li>
     </ul>
-    <p>We use this to run the library, review uploads, handle reports and notices, and confirm Pro. We do not sell data or run analytics, tracking or crash-reporting SDKs. Drift itself does not read a device ID or an advertising ID; the only device-linked value it stores is the notification token above, if you turn notifications on. The optional ad described under <a href="#ads">Ads</a> below is handled by Google AdMob.</p>
+    <p>We use this to run the library, review uploads, handle reports and notices, and confirm Pro. We do not sell data and run no crash-reporting SDK. Since version 1.9.3 Drift uses Google Analytics for Firebase only to measure our own ads (see <a href="#measuring">Measuring our ads</a> below): no screen tracking, no ad personalization signals. Drift's own code does not read a device ID or an advertising ID; besides the notification token above, if you turn notifications on, the only device-linked value is the app instance ID that Google Analytics for Firebase creates. The optional ad described under <a href="#ads">Ads</a> below is handled by Google AdMob.</p>
   </section>
 
   <hr class="rule">
@@ -204,6 +204,20 @@
   </section>
 
   <hr class="rule">
+  <section class="prose" id="measuring">
+    <h2>Measuring our ads (since version 1.9.3)</h2>
+    <p>We advertise Drift on Google Ads. So that those ads reach people who actually enjoy Drift, the app uses <b>Google Analytics for Firebase</b> (Google LLC), in the narrowest way we could:</p>
+    <ul>
+      <li>Our code sends two events only: <b>wallpaper_applied</b> (the first time Drift is seen as your live wallpaper, once per install) and <b>reward_earned</b> (you finished a rewarded ad; it says whether it was for an upload or an unlock). Neither carries your account, username or anything you uploaded.</li>
+      <li>The Firebase SDK also records a few basic events on its own, which cannot be switched off: first open, session start, time in the app, app and Android updates, in-app purchases, impressions and rewards of the ads it shows, and removing the app or clearing its data. With them it uses an app instance ID and, where allowed, your device's advertising ID, plus device and app information and an approximate location derived from your IP address.</li>
+      <li>Screen tracking is off and ad personalization signals are never sent.</li>
+      <li>Measurement starts only after Google's consent check has run once; later launches use the last result. In the EU, the UK and Switzerland nothing is stored or sent for advertising purposes (ad storage and ad user data stay denied).</li>
+      <li>The events are shared with Google Ads to count conversions from our ad campaigns, under <a href="https://policies.google.com/technologies/partner-sites">Google's own policy for partner apps</a>. Google Analytics keeps user-level event data for 2 months; totals in reports, and conversions already counted in Google Ads, are kept longer.</li>
+    </ul>
+    <p>You can reset your advertising ID in your Android settings; uninstalling Drift ends the measurement.</p>
+  </section>
+
+  <hr class="rule">
   <section class="prose">
     <h2>How long we keep things</h2>
     <div class="table-wrap"><table>
@@ -215,6 +229,7 @@
       <tr><td>Strikes, bans and the used free first upload of a deleted account, stored as a one-way fingerprint of the Google account</td><td>1 year</td></tr>
       <tr><td>Resolved reports (upheld or dismissed)</td><td>deleted 1 year after they are handled. Open reports are kept until a moderator handles them.</td></tr>
       <tr><td>Notification token</td><td>until you sign out, delete the account, or it stops working</td></tr>
+      <tr><td>Ad-measurement events (Google Analytics for Firebase)</td><td>user-level data 2 months; report totals and counted ad conversions longer</td></tr>
       <tr><td>Account, profile, likes, blocks, appeals, the ad reward confirmations (transaction ID and time), the wallpapers you unlocked with an ad and the Pro purchase link (token digest, product, end date)</td><td>until you delete the account</td></tr>
     </table></div>
   </section>
@@ -230,8 +245,9 @@
       <li><b>Google AdMob</b> (Google LLC): the optional ad that earns an upload or unlocks a wallpaper, and the signed reward confirmation.</li>
       <li><b>Google Play:</b> purchases, and its billing component's own diagnostics under <a href="https://policies.google.com/privacy">Google's privacy policy</a>.</li>
       <li><b>Firebase Cloud Messaging</b> (Google LLC): delivers notifications, if you turn them on. It receives the notification token and the notification text.</li>
+      <li><b>Google Analytics for Firebase</b> (Google LLC): the few ad-measurement events described under <a href="#measuring">Measuring our ads</a>, shared with Google Ads to count ad conversions.</li>
     </ul>
-    <p>Some of these providers (Google Play, Google AdMob, Firebase Cloud Messaging, Cloudflare) may process data outside the EU under their standard safeguards. Public wallpapers and the username of the uploader are visible to everyone.</p>
+    <p>Some of these providers (Google Play, Google AdMob, Firebase Cloud Messaging, Google Analytics for Firebase, Cloudflare) may process data outside the EU under their standard safeguards. Public wallpapers and the username of the uploader are visible to everyone.</p>
     <p><b>Data controller: FOA Studios, main@foastudios.com</b></p>
   </section>
 
@@ -272,7 +288,7 @@
   </section>
 
   <footer>
-    <span class="mono">Last updated 2 November 2026</span>
+    <span class="mono">Last updated 19 November 2026</span>
     <span>© 2026 <a href="https://foastudios.com/">FOA Studios</a> · Drift Live Wallpapers</span>
   </footer>
 </main>
